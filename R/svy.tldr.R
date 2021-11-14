@@ -1,3 +1,20 @@
+#' svy.tldr
+#'
+#' @param df A survey dataframe consisting of at minimum a survey item formatted as a factor variable.
+#' @param ids Survey case ids (optional)
+#' @param strata Survey strata (optional)
+#' @param weights Survey weights (optional)
+#' @param svyitem A survey item with factor (or ordered factor) format
+#' @param svygrp A survey grouping variable, can be binary or multiple group, in factor format (optional)
+#' @param fltr.refuse Filter refusals formatted 'refused' (Default = TRUE)
+#' @param fltr.nas Filter NAs across dataframe (Default = TRUE)
+#' @param low.n.flg Flag estimates with less than n = 100 in either svyitem response option or svygroup (or the combination thereof)
+#'
+#' @return A tibble with M, SE, and unweighted Ns for each response for svyitem (or each response for svyitem within svygroup)
+#' @export
+#'
+#' @examples
+#' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svy.tldr <- function(df,ids,strata,weights,svyitem,svygrp = NULL,fltr.refuse = T,fltr.nas = T,low.n.flg = F){
 
   options(survey.lonely.psu="adjust")
