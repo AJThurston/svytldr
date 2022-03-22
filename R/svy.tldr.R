@@ -15,6 +15,9 @@
 #'
 #' @examples
 #' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
+
+# TODO: Actually make IDS, Strata, and Weights optional
+
 svy.tldr <- function(df,ids,strata,weights,svyitem,svygrp = NULL,fltr.refuse = T,fltr.nas = T,low.n.flg = F){
 
   options(survey.lonely.psu="adjust")
