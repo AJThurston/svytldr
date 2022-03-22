@@ -16,7 +16,7 @@
 #' @examples
 #' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 
-# TODO: Actually make IDS, Strata, and Weights optional
+# TODO: Actually make IDS, Strata, and Weights optional, use "is.missing" from this answer: https://stackoverflow.com/questions/28370249/correct-way-to-specifiy-optional-arguments-in-r-functions
 
 svy.tldr <- function(df,ids,strata,weights,svyitem,svygrp = NULL,fltr.refuse = T,fltr.nas = T,low.n.flg = F){
 
