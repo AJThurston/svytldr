@@ -22,9 +22,9 @@ svy.tldr <- function(df,ids,strata,weights,svyitem,svygrp = NULL,fltr.refuse = T
 
   options(survey.lonely.psu="adjust")
 
-  if(is.null(svygrp)) {
+  if(missing(svygrp)) {
     res <- df %>%
-      as_survey_design(ids = id, strata = strata, weights = wt) %>%
+      as_survey_design(ids = ids, strata = strata, weights = wt) %>%
       group_by(as.factor("overall"), df[,svyitem], .drop = FALSE) %>%
       summarize(m = survey_mean(), n = unweighted(n()))
     colnames(res)[2] <- svyitem
@@ -32,7 +32,7 @@ svy.tldr <- function(df,ids,strata,weights,svyitem,svygrp = NULL,fltr.refuse = T
 
   } else {
     res1 <- df %>%
-      as_survey_design(ids = id, strata = strata, weights = wt) %>%
+      as_survey_design(ids = ids, strata = strata, weights = wt) %>%
       group_by(as.factor("overall"), df[,svyitem], .drop = FALSE) %>%
       summarize(m = survey_mean(), n = unweighted(n()))
     colnames(res1)[1] <- "group"
