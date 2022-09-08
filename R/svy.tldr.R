@@ -1,11 +1,6 @@
-# SURVEY ANALYSIS CODE
+# SURVEY TOPLINE DATA RESULTS
 # Thurston, AJ
-# 2020-01-14
-#
-# Analysis notes:
-# _f = factors for the survey library for weighted estimates
-# _n = numeric -99 and -97 recoded to missing for corr & SEM estimates
-# _z = z-score values for study variables
+# 2020-09-08
 #
 # Version notes
 # 2020-01-07 Start
