@@ -1,4 +1,4 @@
-# JAMRS SURVEY ANALYSIS CODE
+# SURVEY ANALYSIS CODE
 # Thurston, AJ
 # 2020-01-14
 #
@@ -10,8 +10,7 @@
 # Version notes
 # 2020-01-07 Start
 # 2020-01-14 Combining M,SE,N results into one table
-
-
+# 2022-09-08 Added an option for reformatting as an APA table
 
 #' svy.tldr
 #'
