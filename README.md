@@ -21,8 +21,7 @@ package is predominantly for working with factor variables.
 
 ## Installation
 
-You can install the development version of svy.tldr from
-[GitHub](https://github.com/) with:
+You can install svy.tldr from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -231,20 +230,17 @@ svy.tldr(df = svy.tldr.df,
 This parameter changes the output from tidy format to wide format.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+fmttd <- svy.tldr(df = svy.tldr.df,
          ids = "id",
          strata = "st",
          weights = "wt",
          svyitem = "metgoal",
          svygrp = "eligib",
          fmttd_tbl = T)
-#> # A tibble: 2 x 10
-#> # Groups:   metgoal [2]
-#>   metgoal  overall.m overall.m~1 overa~2 Eligi~3 Eligi~4 Eligi~5 Ineli~6 Ineli~7
-#>   <chr>        <dbl>       <dbl>   <int>   <dbl>   <dbl>   <int>   <dbl>   <dbl>
-#> 1 Achieved     0.818      0.0250     154  0.986  0.00793     114   0.546  0.0588
-#> 2 Unachiev     0.167      0.0241      48  0.0138 0.00793       3   0.454  0.0588
-#> # ... with 1 more variable: Ineligib.n <int>, and abbreviated variable names
-#> #   1: overall.m_se, 2: overall.n, 3: Eligible.m, 4: Eligible.m_se,
-#> #   5: Eligible.n, 6: Ineligib.m, 7: Ineligib.m_se
+
+fmttd %>%
+  kbl() %>%
+  kable_classic(full_width = F)
 ```
+
+![](https://github.com/AJThurston/svy.tldr/man/figures/ex6.PNG)

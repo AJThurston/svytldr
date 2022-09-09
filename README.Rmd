@@ -27,7 +27,7 @@ The goal of svy.tldr is to provide basic, formatted values from complex survey d
 
 ## Installation
 
-You can install the development version of svy.tldr from [GitHub](https://github.com/) with:
+You can install svy.tldr from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -149,12 +149,17 @@ svy.tldr(df = svy.tldr.df,
 ### Example 6 - Present group results as columns with `fmttd_tbl`
 This parameter changes the output from tidy format to wide format.
 
-```{r ex.6}
-svy.tldr(df = svy.tldr.df,
+```{r ex.6, eval=FALSE, message=FALSE, warning=FALSE}
+fmttd <- svy.tldr(df = svy.tldr.df,
          ids = "id",
          strata = "st",
          weights = "wt",
          svyitem = "metgoal",
          svygrp = "eligib",
          fmttd_tbl = T)
+
+fmttd %>%
+  kbl() %>%
+  kable_classic(full_width = F)
 ```
+![](https://github.com/AJThurston/svy.tldr/man/figures/ex6.PNG)
