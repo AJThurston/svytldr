@@ -243,4 +243,4 @@ fmttd %>%
   kable_classic(full_width = F)
 ```
 
-![](https://github.com/AJThurston/svy.tldr/man/figures/ex6.PNG)
+![](https://github.com/AJThurston/svy.tldr/blob/main/man/figures/ex6.PNG)
