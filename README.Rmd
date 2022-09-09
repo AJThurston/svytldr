@@ -14,16 +14,15 @@ knitr::opts_chunk$set(
 ```
 
 # svy.tldr
-## Survey Topline Data in R
+## Survey Tools for Limited Descriptive Research
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of svy.tldr is to provide basic, formatted values from complex survey data.  It is basically just a wrapper for the srvyr package. 
+The goal of svy.tldr is to provide basic, formatted values from complex survey data.  It is basically just a wrapper for the srvyr package.  This package is predominantly for working with factor variables.  
 
 ## To-Do
 * Actually make IDS, Strata, and Weights optional, use "is.missing" from this answer: https://stackoverflow.com/questions/28370249/correct-way-to-specifiy-optional-arguments-in-r-functions  
-* Add dependencies namely srvyr
 * Move away from pipes apparently
 
 ## Installation
@@ -35,27 +34,127 @@ You can install the development version of svy.tldr from [GitHub](https://github
 devtools::install_github("AJThurston/svy.tldr")
 ```
 
-## Example
+## Dependencies
 
-This is a basic example which shows you how to solve a common problem:
+The following packages and versions are required to use `svy.tldr`:
 
-```{r example}
-# library(svy.tldr)
-## basic example code
+* survey (4.1-1)
+* srvyr (1.1.0)
+* tidyverse (1.3.2)
+
+## Parameters
+
+The `svy.tldr` package requires the following parameters:
+
+* df: A survey dataframe consisting of at minimum a survey item formatted as a factor variable.[class = data.frame]
+* ids: Survey case ids (optional) [numeric]
+* strata: Survey strata (optional) [numeric]
+* weights: Survey weights (optional) [numeric]
+* svyitem: A survey item with factor (or ordered factor) format [factor]
+
+The following are optional parameters, but the `svygroup` parameter is often used:
+
+* svygrp: A survey grouping variable, can be binary or multiple group, in factor format (optional) [factor]
+
+These are other optional parameters that change the output of values:
+
+* fltr_refuse: Filter refusals formatted 'refused' (Default = TRUE) [logical]
+* fltr_nas: Filter NAs across dataframe (Default = TRUE) [logical]
+* flg_low_n: Flag estimates with less than n = 100 in either svyitem response option or svygroup (or the combination thereof) [logical]
+
+Finally, this is just a simple formatting parameter to change the output from long `tidy` format data to wide format as in typical survey toplines or for papers:
+
+* fmttd_tbl: Produces a formatted table with columns for each group and statistic (Default = F; statistics nested w/in group) [logical]
+
+## Example dataframe `svy.tldr.df`
+
+The following example dataframe is the `apistrat` dataset from the `survey` package with some minor modifications to make the output of `svy.tldr` easier to interpret. 
+
+```{r data, echo=TRUE, message=FALSE, warning=FALSE}
+library(svy.tldr)
+library(srvyr)
+library(survey)
+library(tidyverse)
+
+load(file='data/svy.tldr.df.rda')
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+## Examples
 
-```{r cars}
-summary(cars)
+### Example 1 - Basic Use
+This example uses the minimum parameters of the `svy.tldr` to produce the means, standard error of the means, and unweighted counts for a factor variable survey response.  Output is a `tidy` style output table with the grouping variable (in this case, only "overall"), the response options for the survey item, and the values mentioned above.
+
+In this example, data from `apistrat` dataset using the `sch.wide` variable which is a binary factor variable for whether or not the PSU achieve its school wide goals.  As in the above, I recoded it to whether or not the school achieved or did not achieve its goals. 
+
+```{r ex.1}
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal")
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/v1/examples>.
+### Example 2 - Use with Groups with `svygrp`
+This is the same as the example above, except the output is now grouped by whether or not the school was eligible for awards (Eligible/Ineligible).  Again, the default is a `tidy` style output table, but the grouping variable includes overall, eligible, and ineligible.
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r ex.2}
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal",
+         svygrp = "eligib")
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+### Example 3 - Filter Refusals with `fltr_refuse`
+The default behavior of `svy.tldr` is to filter refusals, but this function can be turned off if refusals are of value to you.  In this example, there are no refusals.
+
+```{r ex.3}
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal",
+         svygrp = "eligib",
+         fltr_refuse = F)
+```
+
+### Example 4 - Flag low sample size subgroups with `flg_low_n`
+If working with larger datasets, you can flag estimates from smaller (N < 100) sample size subgroups.  The default behavior is to not flag these estimates.  Currently, the size of the flag (i.e., 100) is not adjustable.  This creates a new value where 0 = not flagged, 1 = flagged.
+
+```{r ex.4}
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal",
+         svygrp = "eligib",
+         flg_low_n = T)
+```
+
+### Example 5 - Filter NA responses or groups with `fltr_nas`
+By default, all output data from `svy.tldr` with groups or responses which are `NA` are filtered.  
+
+```{r ex.5}
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal",
+         svygrp = "eligib",
+         fltr_refuse = F,
+         fltr_nas = F)
+```
+
+### Example 6 - Present group results as columns with `fmttd_tbl`
+This parameter changes the output from tidy format to wide format.
+
+```{r ex.6}
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal",
+         svygrp = "eligib",
+         fmttd_tbl = T)
+```
