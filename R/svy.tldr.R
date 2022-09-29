@@ -26,66 +26,68 @@
 #' @examples
 #' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svy.tldr <- function(df,ids,strata,weights,svyitem,svygrp,fltr_refuse=T,fltr_nas=T,flg_low_n = F, fmttd_tbl = F){
-  
+
   options(survey.lonely.psu="adjust")
-  
+
   if(missing(svygrp)) {
     res <- df %>%
       as_survey_design(ids = all_of(ids), strata = all_of(strata), weights = all_of(weights)) %>%
       group_by(as.factor("overall"), df[,svyitem], .drop = FALSE) %>%
       summarize(m = survey_mean(), n = unweighted(n()))
-    colnames(res)[2] <- svyitem
     colnames(res)[1] <- "group"
-    
+    colnames(res)[2] <- "response"
+    res$svyitem <- svyitem
+
   } else {
     res1 <- df %>%
       as_survey_design(ids = ids, strata = strata, weights = weights) %>%
       group_by(as.factor("overall"), df[,svyitem], .drop = FALSE) %>%
       summarize(m = survey_mean(), n = unweighted(n()))
     colnames(res1)[1] <- "group"
-    
+
     res2 <- df %>%
       as_survey_design(ids = ids, strata = strata, weights = weights) %>%
       group_by(df[,svygrp], df[,svyitem], .drop = FALSE) %>%
       summarize(m = survey_mean(), n = unweighted(n()))
     colnames(res2)[1] <- "group"
-    
+
     res <- rbind(res1,res2)
-    colnames(res)[2] <- svyitem
-    
+    colnames(res)[2] <- "response"
+    res$svyitem <- svyitem
+
   }
-  
+
   if(flg_low_n == T){
     res$low_n_flg <- ifelse(res$n >= 100, 0, 1)
   }
-  
+
   if(fltr_refuse == T){
     res <- res[!res[1] == "Refused",] # sometimes capitalized
-    res <- res[!res[1] == "refused",] # somtimes not capitalized    
+    res <- res[!res[1] == "refused",] # somtimes not capitalized
     res <- res[!res[2] == "Refused",] # sometimes capitalized
     res <- res[!res[2] == "refused",] # somtimes not capitalized
   }
-  
+
   if(fltr_nas == T){
     res <- res[complete.cases(res), ]
   }
-  
+
   if(fmttd_tbl == T){
-    
+
     values <- names(res[,3:ncol(res)])
-    
+
     res <- res %>%
       group_by(group, res[,svyitem]) %>%
-      pivot_wider(svyitem, 
-                  names_from = "group", 
+      pivot_wider(svyitem,
+                  names_from = "group",
                   names_glue = "{group}.{.value}",
                   values_from = all_of(values),
                   names_vary = 'slowest')
     res
-  
+
     } else {
-  
+
     res
-  
+
     }
 }
