@@ -293,6 +293,7 @@ fmttd <- svy.tldr(df = svy.tldr.df,
          svygrp = "eligib",
          fmttd_tbl = T)
 
+library(kableExtra)
 fmttd %>%
   kbl() %>%
   kable_classic(full_width = F)
