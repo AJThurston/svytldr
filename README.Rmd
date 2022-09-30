@@ -118,6 +118,8 @@ Additionally, multiple groups can be added as a list.  In this example, the `rac
 
 For multiple groups, groups are not combined as in the `interaction` function; each group is tested independently.
 ```{r ex.2b}
+svy.tldr.df$eligib <- as.factor(svy.tldr.df$eligib)
+
 svy.tldr(df = svy.tldr.df,
          ids = "id",
          strata = "st",

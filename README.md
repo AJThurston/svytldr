@@ -170,6 +170,8 @@ For multiple groups, groups are not combined as in the `interaction`
 function; each group is tested independently.
 
 ``` r
+svy.tldr.df$eligib <- as.factor(svy.tldr.df$eligib)
+
 svy.tldr(df = svy.tldr.df,
          ids = "id",
          strata = "st",
@@ -179,7 +181,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 13 x 7
 #> # Groups:   group [2]
 #>    question response group         m   m_se     n raceeth
-#>    <chr>    <chr>    <chr>     <dbl>  <dbl> <int> <fct>  
+#>    <chr>    <chr>    <fct>     <dbl>  <dbl> <int> <fct>  
 #>  1 metgoal  Achieved Eligible 0.982  0.0125    62 wnh    
 #>  2 metgoal  Unachiev Eligible 0.0178 0.0125     2 wnh    
 #>  3 metgoal  Achieved Eligible 1      0         16 bnh    
@@ -212,7 +214,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 7 x 6
 #> # Groups:   group [3]
 #>   question response group          m    m_se     n
-#>   <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
+#>   <chr>    <chr>    <fct>      <dbl>   <dbl> <int>
 #> 1 metgoal  Achieved overall  0.818   0.0250    154
 #> 2 metgoal  Refused  overall  0.00556 0.00397     2
 #> 3 metgoal  Unachiev overall  0.167   0.0241     48
@@ -239,7 +241,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 10 x 6
 #> # Groups:   group [4]
 #>    question response group          m    m_se     n
-#>    <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
+#>    <chr>    <chr>    <fct>      <dbl>   <dbl> <int>
 #>  1 metgoal  Achieved overall  0.818   0.0250    154
 #>  2 metgoal  Refused  overall  0.00556 0.00397     2
 #>  3 metgoal  Unachiev overall  0.167   0.0241     48
@@ -270,7 +272,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 6 x 7
 #> # Groups:   group [3]
 #>   question response group         m    m_se     n low_n_flg
-#>   <chr>    <chr>    <chr>     <dbl>   <dbl> <int>     <dbl>
+#>   <chr>    <chr>    <fct>     <dbl>   <dbl> <int>     <dbl>
 #> 1 metgoal  Achieved overall  0.818  0.0250    154         0
 #> 2 metgoal  Unachiev overall  0.167  0.0241     48         1
 #> 3 metgoal  Achieved Eligible 0.986  0.00793   114         0
