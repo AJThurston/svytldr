@@ -26,7 +26,7 @@
 #' @examples
 #' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svy.tldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
-                      fltr_nas = T, flg_low_n = F, fmttd_tbl = F)
+                      fltr_nas = T, flg_low_n = F, wide = F)
 {
   options(survey.lonely.psu = "adjust")
 
@@ -95,7 +95,7 @@ svy.tldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T
   if (fltr_nas == T) {
     res <- res[complete.cases(res), ]
   }
-  if (fmttd_tbl == T) {
+  if (wide == T) {
     values <- names(res[, 4:ncol(res)])
     res <- res %>%
       pivot_wider(id_cols = c(question, response),

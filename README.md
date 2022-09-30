@@ -280,7 +280,7 @@ svy.tldr(df = svy.tldr.df,
 #> 6 metgoal  Unachiev Ineligib 0.454  0.0588     45         1
 ```
 
-### Example 6 - Present group results as columns with `fmttd_tbl`
+### Example 6 - Present group results as columns with `wide`
 
 This argument changes the output from tidy format to wide format.
 
@@ -291,7 +291,7 @@ fmttd <- svy.tldr(df = svy.tldr.df,
          weights = "wt",
          svyitem = "metgoal",
          svygrp = "eligib",
-         fmttd_tbl = T)
+         wide = T)
 
 library(kableExtra)
 fmttd %>%
