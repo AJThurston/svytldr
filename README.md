@@ -170,31 +170,30 @@ For multiple groups, groups are not combined as in the `interaction`
 function; each group is tested independently.
 
 ``` r
-svy.tldr.df$eligib <- as.factor(svy.tldr.df$eligib)
-
 svy.tldr(df = svy.tldr.df,
          ids = "id",
          strata = "st",
          weights = "wt",
          svyitem = "metgoal",
          svygrp = c("eligib","raceeth"))
-#> # A tibble: 13 x 7
-#> # Groups:   group [2]
-#>    question response group         m   m_se     n raceeth
-#>    <chr>    <chr>    <fct>     <dbl>  <dbl> <int> <fct>  
-#>  1 metgoal  Achieved Eligible 0.982  0.0125    62 wnh    
-#>  2 metgoal  Unachiev Eligible 0.0178 0.0125     2 wnh    
-#>  3 metgoal  Achieved Eligible 1      0         16 bnh    
-#>  4 metgoal  Achieved Eligible 0.982  0.0184    26 his    
-#>  5 metgoal  Unachiev Eligible 0.0183 0.0184     1 his    
-#>  6 metgoal  Achieved Eligible 1      0         10 anh    
-#>  7 metgoal  Achieved Ineligib 0.584  0.0731    27 wnh    
-#>  8 metgoal  Unachiev Ineligib 0.416  0.0731    26 wnh    
-#>  9 metgoal  Achieved Ineligib 0.518  0.148      7 bnh    
-#> 10 metgoal  Unachiev Ineligib 0.482  0.148      7 bnh    
-#> 11 metgoal  Achieved Ineligib 0.572  0.135      6 his    
-#> 12 metgoal  Unachiev Ineligib 0.428  0.135      9 his    
-#> 13 metgoal  Unachiev Ineligib 1      0          3 anh
+#> # A tibble: 14 x 6
+#> # Groups:   group [7]
+#>    question response group         m    m_se     n
+#>    <chr>    <chr>    <chr>     <dbl>   <dbl> <int>
+#>  1 metgoal  Achieved overall  0.818  0.0250    154
+#>  2 metgoal  Unachiev overall  0.167  0.0241     48
+#>  3 metgoal  Achieved Eligible 0.986  0.00793   114
+#>  4 metgoal  Unachiev Eligible 0.0138 0.00793     3
+#>  5 metgoal  Achieved Ineligib 0.546  0.0588     40
+#>  6 metgoal  Unachiev Ineligib 0.454  0.0588     45
+#>  7 metgoal  Achieved wnh      0.826  0.0325     89
+#>  8 metgoal  Unachiev wnh      0.169  0.0323     28
+#>  9 metgoal  Achieved bnh      0.841  0.0637     23
+#> 10 metgoal  Unachiev bnh      0.159  0.0637      7
+#> 11 metgoal  Achieved his      0.795  0.0585     32
+#> 12 metgoal  Unachiev his      0.148  0.0488     10
+#> 13 metgoal  Achieved anh      0.779  0.122      10
+#> 14 metgoal  Unachiev anh      0.221  0.122       3
 ```
 
 ### Example 3 - Filter Refusals with `fltr_refuse`
@@ -214,7 +213,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 7 x 6
 #> # Groups:   group [3]
 #>   question response group          m    m_se     n
-#>   <chr>    <chr>    <fct>      <dbl>   <dbl> <int>
+#>   <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
 #> 1 metgoal  Achieved overall  0.818   0.0250    154
 #> 2 metgoal  Refused  overall  0.00556 0.00397     2
 #> 3 metgoal  Unachiev overall  0.167   0.0241     48
@@ -241,7 +240,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 10 x 6
 #> # Groups:   group [4]
 #>    question response group          m    m_se     n
-#>    <chr>    <chr>    <fct>      <dbl>   <dbl> <int>
+#>    <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
 #>  1 metgoal  Achieved overall  0.818   0.0250    154
 #>  2 metgoal  Refused  overall  0.00556 0.00397     2
 #>  3 metgoal  Unachiev overall  0.167   0.0241     48
@@ -272,7 +271,7 @@ svy.tldr(df = svy.tldr.df,
 #> # A tibble: 6 x 7
 #> # Groups:   group [3]
 #>   question response group         m    m_se     n low_n_flg
-#>   <chr>    <chr>    <fct>     <dbl>   <dbl> <int>     <dbl>
+#>   <chr>    <chr>    <chr>     <dbl>   <dbl> <int>     <dbl>
 #> 1 metgoal  Achieved overall  0.818  0.0250    154         0
 #> 2 metgoal  Unachiev overall  0.167  0.0241     48         1
 #> 3 metgoal  Achieved Eligible 0.986  0.00793   114         0
