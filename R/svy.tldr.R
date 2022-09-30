@@ -30,36 +30,56 @@ svy.tldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T
 {
   options(survey.lonely.psu = "adjust")
 
-  dflist <- list() # data frame list for each survey item
+  itemlist <- list() # data frame list for each survey item
+  grplist <- list()
 
   for(i in svyitem){
 
     if (missing(svygrp)) {
-      res <- df %>% as_survey_design(ids = all_of(ids), strata = all_of(strata), weights = all_of(weights)) %>%
+
+      res <- df %>%
+        as_survey_design(ids = ids, strata = strata, weights = weights) %>%
         group_by(as.factor("overall"), df[, i], .drop = FALSE) %>%
         summarize(m = survey_mean(), n = unweighted(n()))
       colnames(res)[1] <- "group"
       colnames(res)[2] <- "response"
       res$question <- i
+      grplist[["overall"]] <- res
     }
+
     else {
-      res1 <- df %>% as_survey_design(ids = ids, strata = strata, weights = weights) %>%
+
+      res <- df %>%
+        as_survey_design(ids = ids, strata = strata, weights = weights) %>%
         group_by(as.factor("overall"), df[, i], .drop = FALSE) %>%
         summarize(m = survey_mean(), n = unweighted(n()))
-      colnames(res1)[1] <- "group"
-      res2 <- df %>% as_survey_design(ids = ids, strata = strata, weights = weights) %>%
-        group_by(df[, svygrp], df[,i], .drop = FALSE) %>%
-        summarize(m = survey_mean(), n = unweighted(n()))
-      colnames(res2)[1] <- "group"
-      res <- rbind(res1, res2)
+      colnames(res)[1] <- "group"
       colnames(res)[2] <- "response"
       res$question <- i
+      grplist[["overall"]] <- res
+
+      for (g in svygrp){
+
+        res2 <- df %>% as_survey_design(ids = ids, strata = strata, weights = weights) %>%
+          group_by(df[,g], df[,i], .drop = FALSE) %>%
+          summarize(m = survey_mean(), n = unweighted(n()))
+        colnames(res2)[1] <- "group"
+        colnames(res2)[2] <- "response"
+        res2$question <- i
+        grplist[[g]] <- res2
+
+      }
+
+      res <- grplist %>%
+        bind_rows() %>%
+        select(question, response, everything())
+
     }
-    dflist[[i]] <- res
+    itemlist[[i]] <- res
 
   }
 
-  res <- dflist %>%
+  res <- itemlist %>%
     bind_rows() %>%
     select(question, response, everything())
 
