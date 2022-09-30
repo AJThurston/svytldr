@@ -18,7 +18,7 @@
 #' @param fltr_refuse Filter refusals formatted 'refused' (Default = TRUE)
 #' @param fltr_nas Filter NAs across dataframe (Default = TRUE)
 #' @param flg_low_n Flag estimates with less than n = 100 in either svyitem response option or svygroup (or the combination thereof)
-#' @param fmttd_tbl Produces a formatted table with columns for each group and statistic (Default = F; statistics nested w/in group)
+#' @param wide Produces a formatted table with columns for each group and statistic (Default = F; statistics nested w/in group)
 #'
 #' @return A tibble with M, SE, and unweighted Ns for each response for svyitem (or each response for svyitem within svygroup)
 #' @export
