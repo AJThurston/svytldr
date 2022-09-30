@@ -45,14 +45,14 @@ The `svy.tldr` package requires the following arguments:
 -   ids: Survey case ids (optional) \[numeric\]
 -   strata: Survey strata (optional) \[numeric\]
 -   weights: Survey weights (optional) \[numeric\]
--   svyitem: A survey item with factor (or ordered factor) format
-    \[factor\]
+-   svyitem: A survey item with factor (or ordered factor) format, or
+    list of factor variables \[factor\]
 
 The following are optional arguments, but the `svygroup` argument is
 often used:
 
 -   svygrp: A survey grouping variable, can be binary or multiple group,
-    in factor format (optional) \[factor\]
+    in factor format, or list of factor variables (optional) \[factor\]
 
 These are other optional arguments that change the output of values:
 
@@ -105,12 +105,34 @@ svy.tldr(df = svy.tldr.df,
          strata = "st",
          weights = "wt",
          svyitem = "metgoal")
-#> # A tibble: 2 x 5
+#> # A tibble: 2 x 6
 #> # Groups:   group [1]
-#>   group   metgoal      m   m_se     n
-#>   <fct>   <chr>    <dbl>  <dbl> <int>
-#> 1 overall Achieved 0.818 0.0250   154
-#> 2 overall Unachiev 0.167 0.0241    48
+#>   question response group       m   m_se     n
+#>   <chr>    <chr>    <fct>   <dbl>  <dbl> <int>
+#> 1 metgoal  Achieved overall 0.818 0.0250   154
+#> 2 metgoal  Unachiev overall 0.167 0.0241    48
+```
+
+Additionally, multiple items can be added as a list. In the latter
+example, the `green` variable is a likert type item corresponding to
+those who dislike the color green, are neutral on the color, or like the
+color.
+
+``` r
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = c("metgoal","green"))
+#> # A tibble: 5 x 6
+#> # Groups:   group [1]
+#>   question response group       m   m_se     n
+#>   <chr>    <chr>    <fct>   <dbl>  <dbl> <int>
+#> 1 metgoal  Achieved overall 0.818 0.0250   154
+#> 2 metgoal  Unachiev overall 0.167 0.0241    48
+#> 3 green    dislikes overall 0.330 0.0357    69
+#> 4 green    neutral  overall 0.341 0.0361    71
+#> 5 green    likes    overall 0.329 0.0360    66
 ```
 
 ### Example 2 - Use with Groups with `svygrp`
@@ -127,16 +149,50 @@ svy.tldr(df = svy.tldr.df,
          weights = "wt",
          svyitem = "metgoal",
          svygrp = "eligib")
-#> # A tibble: 6 x 5
+#> # A tibble: 6 x 6
 #> # Groups:   group [3]
-#>   group    metgoal       m    m_se     n
-#>   <chr>    <chr>     <dbl>   <dbl> <int>
-#> 1 overall  Achieved 0.818  0.0250    154
-#> 2 overall  Unachiev 0.167  0.0241     48
-#> 3 Eligible Achieved 0.986  0.00793   114
-#> 4 Eligible Unachiev 0.0138 0.00793     3
-#> 5 Ineligib Achieved 0.546  0.0588     40
-#> 6 Ineligib Unachiev 0.454  0.0588     45
+#>   question response group         m    m_se     n
+#>   <chr>    <chr>    <chr>     <dbl>   <dbl> <int>
+#> 1 metgoal  Achieved overall  0.818  0.0250    154
+#> 2 metgoal  Unachiev overall  0.167  0.0241     48
+#> 3 metgoal  Achieved Eligible 0.986  0.00793   114
+#> 4 metgoal  Unachiev Eligible 0.0138 0.00793     3
+#> 5 metgoal  Achieved Ineligib 0.546  0.0588     40
+#> 6 metgoal  Unachiev Ineligib 0.454  0.0588     45
+```
+
+Additionally, multiple groups can be added as a list. In this example,
+the `raceeth` variable corresponds to participants reported
+race/ethncity where `wnh` is White, non-Hispanic, `bnh` is Black,
+non-Hispanic, `his` is Hispanic, and `anh` is Asian, non-Hispanic.
+
+For multiple groups, groups are not combined as in the `interaction`
+function; each group is tested independently.
+
+``` r
+svy.tldr(df = svy.tldr.df,
+         ids = "id",
+         strata = "st",
+         weights = "wt",
+         svyitem = "metgoal",
+         svygrp = c("eligib","raceeth"))
+#> # A tibble: 13 x 7
+#> # Groups:   group [2]
+#>    question response group         m   m_se     n raceeth
+#>    <chr>    <chr>    <chr>     <dbl>  <dbl> <int> <fct>  
+#>  1 metgoal  Achieved Eligible 0.982  0.0125    62 wnh    
+#>  2 metgoal  Unachiev Eligible 0.0178 0.0125     2 wnh    
+#>  3 metgoal  Achieved Eligible 1      0         16 bnh    
+#>  4 metgoal  Achieved Eligible 0.982  0.0184    26 his    
+#>  5 metgoal  Unachiev Eligible 0.0183 0.0184     1 his    
+#>  6 metgoal  Achieved Eligible 1      0         10 anh    
+#>  7 metgoal  Achieved Ineligib 0.584  0.0731    27 wnh    
+#>  8 metgoal  Unachiev Ineligib 0.416  0.0731    26 wnh    
+#>  9 metgoal  Achieved Ineligib 0.518  0.148      7 bnh    
+#> 10 metgoal  Unachiev Ineligib 0.482  0.148      7 bnh    
+#> 11 metgoal  Achieved Ineligib 0.572  0.135      6 his    
+#> 12 metgoal  Unachiev Ineligib 0.428  0.135      9 his    
+#> 13 metgoal  Unachiev Ineligib 1      0          3 anh
 ```
 
 ### Example 3 - Filter Refusals with `fltr_refuse`
@@ -153,17 +209,17 @@ svy.tldr(df = svy.tldr.df,
          svyitem = "metgoal",
          svygrp = "eligib",
          fltr_refuse = F)
-#> # A tibble: 7 x 5
+#> # A tibble: 7 x 6
 #> # Groups:   group [3]
-#>   group    metgoal        m    m_se     n
-#>   <chr>    <chr>      <dbl>   <dbl> <int>
-#> 1 overall  Achieved 0.818   0.0250    154
-#> 2 overall  Refused  0.00556 0.00397     2
-#> 3 overall  Unachiev 0.167   0.0241     48
-#> 4 Eligible Achieved 0.986   0.00793   114
-#> 5 Eligible Unachiev 0.0138  0.00793     3
-#> 6 Ineligib Achieved 0.546   0.0588     40
-#> 7 Ineligib Unachiev 0.454   0.0588     45
+#>   question response group          m    m_se     n
+#>   <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
+#> 1 metgoal  Achieved overall  0.818   0.0250    154
+#> 2 metgoal  Refused  overall  0.00556 0.00397     2
+#> 3 metgoal  Unachiev overall  0.167   0.0241     48
+#> 4 metgoal  Achieved Eligible 0.986   0.00793   114
+#> 5 metgoal  Unachiev Eligible 0.0138  0.00793     3
+#> 6 metgoal  Achieved Ineligib 0.546   0.0588     40
+#> 7 metgoal  Unachiev Ineligib 0.454   0.0588     45
 ```
 
 ### Example 4 - Filter NA responses or groups with `fltr_nas`
@@ -180,20 +236,20 @@ svy.tldr(df = svy.tldr.df,
          svygrp = "eligib",
          fltr_refuse = F,
          fltr_nas = F)
-#> # A tibble: 10 x 5
+#> # A tibble: 10 x 6
 #> # Groups:   group [4]
-#>    group    metgoal        m    m_se     n
-#>    <chr>    <chr>      <dbl>   <dbl> <int>
-#>  1 overall  Achieved 0.818   0.0250    154
-#>  2 overall  Refused  0.00556 0.00397     2
-#>  3 overall  Unachiev 0.167   0.0241     48
-#>  4 overall  <NA>     0.00930 0.00733     2
-#>  5 Eligible Achieved 0.986   0.00793   114
-#>  6 Eligible Unachiev 0.0138  0.00793     3
-#>  7 Ineligib Achieved 0.546   0.0588     40
-#>  8 Ineligib Unachiev 0.454   0.0588     45
-#>  9 <NA>     Refused  0.374   0.250       2
-#> 10 <NA>     <NA>     0.626   0.250       2
+#>    question response group          m    m_se     n
+#>    <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
+#>  1 metgoal  Achieved overall  0.818   0.0250    154
+#>  2 metgoal  Refused  overall  0.00556 0.00397     2
+#>  3 metgoal  Unachiev overall  0.167   0.0241     48
+#>  4 metgoal  <NA>     overall  0.00930 0.00733     2
+#>  5 metgoal  Achieved Eligible 0.986   0.00793   114
+#>  6 metgoal  Unachiev Eligible 0.0138  0.00793     3
+#>  7 metgoal  Achieved Ineligib 0.546   0.0588     40
+#>  8 metgoal  Unachiev Ineligib 0.454   0.0588     45
+#>  9 metgoal  Refused  <NA>     0.374   0.250       2
+#> 10 metgoal  <NA>     <NA>     0.626   0.250       2
 ```
 
 ### Example 5 - Flag low sample size subgroups with `flg_low_n`
@@ -211,16 +267,16 @@ svy.tldr(df = svy.tldr.df,
          svyitem = "metgoal",
          svygrp = "eligib",
          flg_low_n = T)
-#> # A tibble: 6 x 6
+#> # A tibble: 6 x 7
 #> # Groups:   group [3]
-#>   group    metgoal       m    m_se     n low_n_flg
-#>   <chr>    <chr>     <dbl>   <dbl> <int>     <dbl>
-#> 1 overall  Achieved 0.818  0.0250    154         0
-#> 2 overall  Unachiev 0.167  0.0241     48         1
-#> 3 Eligible Achieved 0.986  0.00793   114         0
-#> 4 Eligible Unachiev 0.0138 0.00793     3         1
-#> 5 Ineligib Achieved 0.546  0.0588     40         1
-#> 6 Ineligib Unachiev 0.454  0.0588     45         1
+#>   question response group         m    m_se     n low_n_flg
+#>   <chr>    <chr>    <chr>     <dbl>   <dbl> <int>     <dbl>
+#> 1 metgoal  Achieved overall  0.818  0.0250    154         0
+#> 2 metgoal  Unachiev overall  0.167  0.0241     48         1
+#> 3 metgoal  Achieved Eligible 0.986  0.00793   114         0
+#> 4 metgoal  Unachiev Eligible 0.0138 0.00793     3         1
+#> 5 metgoal  Achieved Ineligib 0.546  0.0588     40         1
+#> 6 metgoal  Unachiev Ineligib 0.454  0.0588     45         1
 ```
 
 ### Example 6 - Present group results as columns with `fmttd_tbl`
