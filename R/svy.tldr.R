@@ -60,13 +60,13 @@ svy.tldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T
 
       for (g in svygrp){
 
-        res <- df %>% as_survey_design(ids = ids, strata = strata, weights = weights) %>%
+        res2 <- df %>% as_survey_design(ids = ids, strata = strata, weights = weights) %>%
           group_by(df[,g], df[,i], .drop = FALSE) %>%
           summarize(m = survey_mean(), n = unweighted(n()))
-        colnames(res)[1] <- "group"
-        colnames(res)[2] <- "response"
-        res$question <- i
-        grplist[[g]] <- res
+        colnames(res2)[1] <- "group"
+        colnames(res2)[2] <- "response"
+        res2$question <- i
+        grplist[[g]] <- res2
 
       }
 
