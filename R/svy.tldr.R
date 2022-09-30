@@ -72,7 +72,7 @@ svy.tldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T
 
       res <- grplist %>%
         bind_rows() %>%
-        select(question, response, everything())
+        select(question, response, group, everything())
 
     }
     itemlist[[i]] <- res
