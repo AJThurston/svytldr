@@ -33,5 +33,5 @@ svytldr_missing <- function(df, missing_list, clean_val_labs = F){
     }
   }
   df <- df %>%
-    mutuate_if(is.factor, replace_factor_na)
+    mutate_if(is.factor, replace_factor_na)
 }
