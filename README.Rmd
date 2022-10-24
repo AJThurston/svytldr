@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# svy.tldr
+# svytldr
 ## Survey Tools for Limited Descriptive Research
 
 <!-- badges: start -->
@@ -27,16 +27,16 @@ The goal of svy.tldr is to provide basic, formatted values from complex survey d
 
 ## Installation
 
-You can install svy.tldr from GitHub with:
+You can install svytldr from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("AJThurston/svy.tldr")
+devtools::install_github("AJThurston/svytldr")
 ```
 
 ## Dependencies
 
-The following packages and versions are required to use `svy.tldr`:
+The following packages and versions are required to use `svytldr`:
 
 * survey (4.1-1)
 * srvyr (1.1.0)
@@ -44,7 +44,7 @@ The following packages and versions are required to use `svy.tldr`:
 
 ## Arguments
 
-The `svy.tldr` package requires the following arguments:
+The `svytldr` package requires the following arguments:
 
 * df: A survey dataframe consisting of at minimum a survey item formatted as a factor variable.[class = data.frame]
 * ids: Survey case ids (optional) [numeric]
@@ -66,27 +66,27 @@ Finally, this is just a simple formatting argument to change the output from lon
 
 * fmttd_tbl: Produces a formatted table with columns for each group and statistic (Default = F; statistics nested w/in group) [logical]
 
-## Example dataframe `svy.tldr.df`
+## Example dataframe `svytldr_df`
 
-The following example dataframe is the `apistrat` dataset from the `survey` package with some minor modifications to make the output of `svy.tldr` easier to interpret. 
+The following example dataframe is the `apistrat` dataset from the `survey` package with some minor modifications to make the output of `svytldr` easier to interpret. 
 
 ```{r data, echo=TRUE, message=FALSE, warning=FALSE}
-library(svy.tldr)
+library(svytldr)
 library(srvyr)
 library(survey)
 library(tidyverse)
 
-data(svy.tldr.df)
+data(svytldr_df)
 ```
 
 ## Examples
 
 ### Example 1 - Basic Use
-This example uses the minimum arguments of the `svy.tldr` to produce the means, standard error of the means, and unweighted counts for a factor variable survey response.  Output is a `tidy` style output table with the grouping variable (in this case, only "overall"), the response options for the survey item, and the values mentioned above.
+This example uses the minimum arguments of the `svytldr` to produce the means, standard error of the means, and unweighted counts for a factor variable survey response.  Output is a `tidy` style output table with the grouping variable (in this case, only "overall"), the response options for the survey item, and the values mentioned above.
 
-In this example, data from `svy.tldr.df` dataset using the `metgoal` variable which is a binary factor variable for whether or not the person met their goal. 
+In this example, data from `svytldr_df` dataset using the `metgoal` variable which is a binary factor variable for whether or not the person met their goal. 
 ```{r ex.1a}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -95,7 +95,7 @@ svy.tldr(df = svy.tldr.df,
 Additionally, multiple items can be added as a list.  In the latter example, the `green` variable is a likert type item corresponding to those who dislike the color green, are neutral on the color, or like the color.
 
 ```{r ex.1b}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -107,7 +107,7 @@ svy.tldr(df = svy.tldr.df,
 This is the same as the example above, except the output is now grouped by whether or not the case was eligible (Eligible/Ineligible).  Again, the default is a `tidy` style output table, but the grouping variable includes overall, eligible, and ineligible.
 
 ```{r ex.2a}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -118,7 +118,7 @@ Additionally, multiple groups can be added as a list.  In this example, the `rac
 
 For multiple groups, groups are not combined as in the `interaction` function; each group is tested independently.
 ```{r ex.2b}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -127,10 +127,10 @@ svy.tldr(df = svy.tldr.df,
 ```
 
 ### Example 3 - Filter Refusals with `fltr_refuse`
-The default behavior of `svy.tldr` is to filter refusals, but this function can be turned off if refusals are of value to you.  In this example, there are no refusals.
+The default behavior of `svytldr` is to filter refusals, but this function can be turned off if refusals are of value to you.  In this example, there are no refusals.
 
 ```{r ex.3}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -140,10 +140,10 @@ svy.tldr(df = svy.tldr.df,
 ```
 
 ### Example 4 - Filter NA responses or groups with `fltr_nas`
-By default, all output data from `svy.tldr` with groups or responses which are `NA` are filtered.  
+By default, all output data from `svytldr` with groups or responses which are `NA` are filtered.  
 
 ```{r ex.4}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -157,7 +157,7 @@ svy.tldr(df = svy.tldr.df,
 If working with larger datasets, you can flag estimates from smaller (N < 100) sample size subgroups.  The default behavior is to not flag these estimates.  Currently, the size of the flag (i.e., 100) is not adjustable.  This creates a new value where 0 = not flagged, 1 = flagged.
 
 ```{r ex.5}
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -170,7 +170,7 @@ svy.tldr(df = svy.tldr.df,
 This argument changes the output from tidy format to wide format.
 
 ```{r ex.6, eval=FALSE, message=FALSE, warning=FALSE}
-fmttd <- svy.tldr(df = svy.tldr.df,
+fmttd <- svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -183,4 +183,4 @@ fmttd %>%
   kbl() %>%
   kable_classic(full_width = F)
 ```
-![](https://github.com/AJThurston/svy.tldr/blob/main/man/figures/ex6.PNG)
+![](https://github.com/AJThurston/svytldr/blob/main/man/figures/ex6.PNG)

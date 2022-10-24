@@ -7,7 +7,7 @@
 # 2020-01-14 Combining M,SE,N results into one table
 # 2022-09-08 Added an option for reformatting as an APA table
 
-#' svy.tldr
+#' svytldr
 #'
 #' @param df A survey dataframe consisting of at minimum a survey item formatted as a factor variable.
 #' @param ids Survey case ids (optional)
@@ -24,8 +24,8 @@
 #' @export
 #'
 #' @examples
-#' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
-svy.tldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
+#' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
+svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
                       fltr_nas = T, flg_low_n = F, wide = F)
 {
   options(survey.lonely.psu = "adjust")

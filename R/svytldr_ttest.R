@@ -1,4 +1,4 @@
-svy.tldr.ttest <- function(df,svyitem,svygrp,design){
+svytldr.ttest <- function(df,svyitem,svygrp,design){
   #Get all possible response options for svyitem
   res.opts <- df[,svyitem] %>%
     as.character() %>%
