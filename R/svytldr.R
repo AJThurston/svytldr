@@ -109,4 +109,3 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
     res
   }
 }
-

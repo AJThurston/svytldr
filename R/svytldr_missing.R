@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' svy.tldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
+#' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svytldr_missing <- function(df, missing_list, clean_val_labs = F){
   if(clean_val_labs = F){
     replace_factor_na <- function(var){
