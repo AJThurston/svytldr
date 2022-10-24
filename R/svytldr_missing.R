@@ -17,14 +17,14 @@
 #' @examples
 #' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svytldr_missing <- function(df, missing_list, clean_val_labs = F){
-  if(clean_val_labs = F){
+  if(clean_val_labs == F){
     replace_factor_na <- function(var){
       var <- as.character(var)
       var <- gsub(missing_list, NA_character_, var)
       var <- as.factor(var)
     }
   }
-  if(clean_val_labs = T){
+  if(clean_val_labs == T){
     replace_factor_na <- function(var){
       var <- as.character(var)
       var <- gsub(missing_list, NA_character_, var)
