@@ -8,6 +8,5 @@ Description: An R Package for flexible survey tools for limited descriptive rese
 License: CC0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Imports: survey, srvyr, tidyverse
-

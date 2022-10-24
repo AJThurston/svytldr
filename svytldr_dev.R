@@ -1,48 +1,15 @@
 library(devtools)
 
-# create_package(""C:\\Users\\AJ Thurston\\Documents\\GitHub\\svy.tldr"")
+create_package("C:\\Users\\AJ Thurston\\Documents\\GitHub\\svytldr")
 
-load_all()
+library(svytldr)
+library(srvyr)
+library(survey)
+library(tidyverse)
+
+data(svytldr_df)
 
 document()
-
-library(survey)
-library(haven)
-library(summarytools)
-library(tidyverse)
-library(srvyr)
-
-
-
-# Original YRBSS data 2019, bless the SAScii package for overcoming this format...
-
-
-
-# install_github("ajdamico/lodown")
-library(lodown)
-# http://asdfree.com/youth-risk-behavior-surveillance-system-yrbss.html
-
-# lodown( "yrbss" , output_dir = file.path( path.expand( "~" ) , "YRBSS" ) )
-
-yrbss_cat <-
-  get_catalog( "yrbss" ,
-               output_dir = file.path( path.expand( "~" ) , "YRBSS" ) )
-yrbss_cat <- subset( yrbss_cat , year == 2019 )
-yrbss_cat <- lodown( "yrbss" , yrbss_cat )
-
-
-yrbss_df <- readRDS( file.path( path.expand( "~" ) , "YRBSS" , "2019 main.rds" ) )
-
-colnames(yrbss_df)
-
-print(dfSummary(yrbss_df), method = "browser")
-
-yrbs <- yrbss_df %>%
-  select(., psu, stratum, weight, age, sex, race4, race7, q8, q67, q77)
-# set.seed(12345)
-# yrbs <- yrbs[sample(nrow(yrbs), size= 5000), ]
-
-
 
 yrbs$sex <- yrbs$sex %>%
   recode_factor(.,
