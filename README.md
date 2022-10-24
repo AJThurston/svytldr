@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# svy.tldr
+# svytldr
 
 ## Survey Tools for Limited Descriptive Research
 
@@ -14,93 +14,92 @@ package is predominantly for working with factor variables.
 
 ## To-Do
 
--   Actually make IDS, Strata, and Weights optional, use “is.missing”
-    from this answer:
-    <https://stackoverflow.com/questions/28370249/correct-way-to-specifiy-optional-arguments-in-r-functions>  
--   Move away from pipes apparently
+- Actually make IDS, Strata, and Weights optional, use “is.missing” from
+  this answer:
+  <https://stackoverflow.com/questions/28370249/correct-way-to-specifiy-optional-arguments-in-r-functions>  
+- Move away from pipes apparently
 
 ## Installation
 
-You can install svy.tldr from GitHub with:
+You can install svytldr from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("AJThurston/svy.tldr")
+devtools::install_github("AJThurston/svytldr")
 ```
 
 ## Dependencies
 
-The following packages and versions are required to use `svy.tldr`:
+The following packages and versions are required to use `svytldr`:
 
--   survey (4.1-1)
--   srvyr (1.1.0)
--   tidyverse (1.3.2)
+- survey (4.1-1)
+- srvyr (1.1.0)
+- tidyverse (1.3.2)
 
 ## Arguments
 
-The `svy.tldr` package requires the following arguments:
+The `svytldr` package requires the following arguments:
 
--   df: A survey dataframe consisting of at minimum a survey item
-    formatted as a factor variable.\[class = data.frame\]
--   ids: Survey case ids (optional) \[numeric\]
--   strata: Survey strata (optional) \[numeric\]
--   weights: Survey weights (optional) \[numeric\]
--   svyitem: A survey item with factor (or ordered factor) format, or
-    list of factor variables \[factor\]
+- df: A survey dataframe consisting of at minimum a survey item
+  formatted as a factor variable.\[class = data.frame\]
+- ids: Survey case ids (optional) \[numeric\]
+- strata: Survey strata (optional) \[numeric\]
+- weights: Survey weights (optional) \[numeric\]
+- svyitem: A survey item with factor (or ordered factor) format, or list
+  of factor variables \[factor\]
 
 The following are optional arguments, but the `svygroup` argument is
 often used:
 
--   svygrp: A survey grouping variable, can be binary or multiple group,
-    in factor format, or list of factor variables (optional) \[factor\]
+- svygrp: A survey grouping variable, can be binary or multiple group,
+  in factor format, or list of factor variables (optional) \[factor\]
 
 These are other optional arguments that change the output of values:
 
--   fltr_refuse: Filter refusals formatted ‘refused’ (Default = TRUE)
-    \[logical\]
--   fltr_nas: Filter NAs across dataframe (Default = TRUE) \[logical\]
--   flg_low_n: Flag estimates with less than n = 100 in either svyitem
-    response option or svygroup (or the combination thereof) \[logical\]
+- fltr_refuse: Filter refusals formatted ‘refused’ (Default = TRUE)
+  \[logical\]
+- fltr_nas: Filter NAs across dataframe (Default = TRUE) \[logical\]
+- flg_low_n: Flag estimates with less than n = 100 in either svyitem
+  response option or svygroup (or the combination thereof) \[logical\]
 
 Finally, this is just a simple formatting argument to change the output
 from long `tidy` format data to wide format as in typical survey
 toplines or for papers:
 
--   fmttd_tbl: Produces a formatted table with columns for each group
-    and statistic (Default = F; statistics nested w/in group)
-    \[logical\]
+- fmttd_tbl: Produces a formatted table with columns for each group and
+  statistic (Default = F; statistics nested w/in group) \[logical\]
 
-## Example dataframe `svy.tldr.df`
+## Example dataframe `svytldr_df`
 
 The following example dataframe is the `apistrat` dataset from the
 `survey` package with some minor modifications to make the output of
-`svy.tldr` easier to interpret.
+`svytldr` easier to interpret.
 
 ``` r
-library(svy.tldr)
+library(svytldr)
 library(srvyr)
 library(survey)
 library(tidyverse)
 
-data(svy.tldr.df)
+data(svytldr_df)
 ```
 
 ## Examples
 
 ### Example 1 - Basic Use
 
-This example uses the minimum arguments of the `svy.tldr` to produce the
+This example uses the minimum arguments of the `svytldr` to produce the
 means, standard error of the means, and unweighted counts for a factor
 variable survey response. Output is a `tidy` style output table with the
 grouping variable (in this case, only “overall”), the response options
 for the survey item, and the values mentioned above.
 
-In this example, data from `svy.tldr.df` dataset using the `metgoal`
+In this example, data from `svytldr_df` dataset using the `metgoal`
 variable which is a binary factor variable for whether or not the person
 met their goal.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -119,7 +118,7 @@ those who dislike the color green, are neutral on the color, or like the
 color.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -143,7 +142,7 @@ the default is a `tidy` style output table, but the grouping variable
 includes overall, eligible, and ineligible.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -170,7 +169,7 @@ For multiple groups, groups are not combined as in the `interaction`
 function; each group is tested independently.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -198,12 +197,12 @@ svy.tldr(df = svy.tldr.df,
 
 ### Example 3 - Filter Refusals with `fltr_refuse`
 
-The default behavior of `svy.tldr` is to filter refusals, but this
+The default behavior of `svytldr` is to filter refusals, but this
 function can be turned off if refusals are of value to you. In this
 example, there are no refusals.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -225,11 +224,11 @@ svy.tldr(df = svy.tldr.df,
 
 ### Example 4 - Filter NA responses or groups with `fltr_nas`
 
-By default, all output data from `svy.tldr` with groups or responses
+By default, all output data from `svytldr` with groups or responses
 which are `NA` are filtered.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -261,7 +260,7 @@ estimates. Currently, the size of the flag (i.e., 100) is not
 adjustable. This creates a new value where 0 = not flagged, 1 = flagged.
 
 ``` r
-svy.tldr(df = svy.tldr.df,
+svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -285,7 +284,7 @@ svy.tldr(df = svy.tldr.df,
 This argument changes the output from tidy format to wide format.
 
 ``` r
-fmttd <- svy.tldr(df = svy.tldr.df,
+fmttd <- svytldr(df = svytldr_df,
          ids = "id",
          strata = "st",
          weights = "wt",
@@ -299,4 +298,4 @@ fmttd %>%
   kable_classic(full_width = F)
 ```
 
-![](https://github.com/AJThurston/svy.tldr/blob/main/man/figures/ex6.PNG)
+![](https://github.com/AJThurston/svytldr/blob/main/man/figures/ex6.PNG)
