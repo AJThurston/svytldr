@@ -20,22 +20,23 @@ svytldr_missing <- function(df, missing_list, clean_val_labs = F){
 
   missing_list <- paste(missing_list, collapse = "|")
 
-    if(clean_val_labs == F){
-      replace_factor_na <- function(var){
-        var <- as.character(var)
-        var <- gsub(missing_list, NA_character_, var)
-        var <- as.factor(var)
-      }
+  if(clean_val_labs == F){
+    replace_factor_na <- function(var){
+      var <- as.character(var)
+      var <- gsub(missing_list, NA_character_, var)
+      var <- as.factor(var)
     }
-    if(clean_val_labs == T){
-      replace_factor_na <- function(var){
-        var <- as.character(var)
-        var <- gsub(missing_list, NA_character_, var)
-        var <- gsub(":.*","", var)
-        var <- as.factor(var)
-      }
+  }
+  if(clean_val_labs == T){
+    replace_factor_na <- function(var){
+      var <- as.character(var)
+      var <- gsub(missing_list, NA_character_, var)
+      var <- gsub(":.*","", var)
+      var <- as.factor(var)
     }
-    df <- df %>%
-      mutate_if(is.factor, replace_factor_na)
+  }
+  df <- df %>%
+    mutate_if(is.factor, replace_factor_na)
   return(df)
+
 }
