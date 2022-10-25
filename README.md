@@ -8,7 +8,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of svy.tldr is to provide basic, formatted values from complex
+The goal of svytldr is to provide basic, formatted values from complex
 survey data. It is basically just a wrapper for the srvyr package. This
 package is predominantly for working with factor variables.
 
