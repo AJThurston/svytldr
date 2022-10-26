@@ -31,11 +31,12 @@ The following packages and versions are required to use `svytldr`:
 
 ## Note
 
-In addition to the `svytldr` function, the package provides a [helper
-cleaning
-function](https://github.com/AJThurston/svytldr#examples---svytldr_missing)
-that is designed to focus on factor variables for analysis as in the
-examples below.
+In addition to the `svytldr` function, the package provides a helper
+cleaning that is designed to focus on factor variables for analysis as
+in the examples below.
+
+[Jump to
+`svytldr_missing`](https://github.com/AJThurston/svytldr#examples---svytldr_missing)
 
 ## Arguments
 
