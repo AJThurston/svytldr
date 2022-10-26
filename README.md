@@ -107,9 +107,9 @@ svytldr(df = svytldr_df,
 #> # A tibble: 2 x 6
 #> # Groups:   group [1]
 #>   question response group       m   m_se     n
-#>   <chr>    <chr>    <fct>   <dbl>  <dbl> <int>
-#> 1 metgoal  Achieved overall 0.818 0.0250   154
-#> 2 metgoal  Unachiev overall 0.167 0.0241    48
+#>   <chr>    <fct>    <fct>   <dbl>  <dbl> <int>
+#> 1 metgoal  achieved overall 0.818 0.0250   154
+#> 2 metgoal  unachiev overall 0.167 0.0241    48
 ```
 
 Additionally, multiple items can be added as a list. In the latter
@@ -126,12 +126,12 @@ svytldr(df = svytldr_df,
 #> # A tibble: 5 x 6
 #> # Groups:   group [1]
 #>   question response group       m   m_se     n
-#>   <chr>    <chr>    <fct>   <dbl>  <dbl> <int>
-#> 1 metgoal  Achieved overall 0.818 0.0250   154
-#> 2 metgoal  Unachiev overall 0.167 0.0241    48
+#>   <chr>    <fct>    <fct>   <dbl>  <dbl> <int>
+#> 1 metgoal  achieved overall 0.818 0.0250   154
+#> 2 metgoal  unachiev overall 0.167 0.0241    48
 #> 3 green    dislikes overall 0.330 0.0357    69
-#> 4 green    neutral  overall 0.341 0.0361    71
-#> 5 green    likes    overall 0.329 0.0360    66
+#> 4 green    likes    overall 0.329 0.0360    66
+#> 5 green    neutral  overall 0.341 0.0361    71
 ```
 
 ### Example 2 - Use with Groups with `svygrp`
@@ -151,13 +151,13 @@ svytldr(df = svytldr_df,
 #> # A tibble: 6 x 6
 #> # Groups:   group [3]
 #>   question response group         m    m_se     n
-#>   <chr>    <chr>    <chr>     <dbl>   <dbl> <int>
-#> 1 metgoal  Achieved overall  0.818  0.0250    154
-#> 2 metgoal  Unachiev overall  0.167  0.0241     48
-#> 3 metgoal  Achieved Eligible 0.986  0.00793   114
-#> 4 metgoal  Unachiev Eligible 0.0138 0.00793     3
-#> 5 metgoal  Achieved Ineligib 0.546  0.0588     40
-#> 6 metgoal  Unachiev Ineligib 0.454  0.0588     45
+#>   <chr>    <fct>    <fct>     <dbl>   <dbl> <int>
+#> 1 metgoal  achieved overall  0.818  0.0250    154
+#> 2 metgoal  unachiev overall  0.167  0.0241     48
+#> 3 metgoal  achieved eligible 0.986  0.00793   114
+#> 4 metgoal  unachiev eligible 0.0138 0.00793     3
+#> 5 metgoal  achieved ineligib 0.546  0.0588     40
+#> 6 metgoal  unachiev ineligib 0.454  0.0588     45
 ```
 
 Additionally, multiple groups can be added as a list. In this example,
@@ -178,21 +178,21 @@ svytldr(df = svytldr_df,
 #> # A tibble: 14 x 6
 #> # Groups:   group [7]
 #>    question response group         m    m_se     n
-#>    <chr>    <chr>    <chr>     <dbl>   <dbl> <int>
-#>  1 metgoal  Achieved overall  0.818  0.0250    154
-#>  2 metgoal  Unachiev overall  0.167  0.0241     48
-#>  3 metgoal  Achieved Eligible 0.986  0.00793   114
-#>  4 metgoal  Unachiev Eligible 0.0138 0.00793     3
-#>  5 metgoal  Achieved Ineligib 0.546  0.0588     40
-#>  6 metgoal  Unachiev Ineligib 0.454  0.0588     45
-#>  7 metgoal  Achieved wnh      0.826  0.0325     89
-#>  8 metgoal  Unachiev wnh      0.169  0.0323     28
-#>  9 metgoal  Achieved bnh      0.841  0.0637     23
-#> 10 metgoal  Unachiev bnh      0.159  0.0637      7
-#> 11 metgoal  Achieved his      0.795  0.0585     32
-#> 12 metgoal  Unachiev his      0.148  0.0488     10
-#> 13 metgoal  Achieved anh      0.779  0.122      10
-#> 14 metgoal  Unachiev anh      0.221  0.122       3
+#>    <chr>    <fct>    <fct>     <dbl>   <dbl> <int>
+#>  1 metgoal  achieved overall  0.818  0.0250    154
+#>  2 metgoal  unachiev overall  0.167  0.0241     48
+#>  3 metgoal  achieved eligible 0.986  0.00793   114
+#>  4 metgoal  unachiev eligible 0.0138 0.00793     3
+#>  5 metgoal  achieved ineligib 0.546  0.0588     40
+#>  6 metgoal  unachiev ineligib 0.454  0.0588     45
+#>  7 metgoal  achieved anh      0.779  0.122      10
+#>  8 metgoal  unachiev anh      0.221  0.122       3
+#>  9 metgoal  achieved bnh      0.841  0.0637     23
+#> 10 metgoal  unachiev bnh      0.159  0.0637      7
+#> 11 metgoal  achieved his      0.795  0.0585     32
+#> 12 metgoal  unachiev his      0.148  0.0488     10
+#> 13 metgoal  achieved wnh      0.826  0.0325     89
+#> 14 metgoal  unachiev wnh      0.169  0.0323     28
 ```
 
 ### Example 3 - Filter Refusals with `fltr_refuse`
@@ -209,17 +209,19 @@ svytldr(df = svytldr_df,
          svyitem = "metgoal",
          svygrp = "eligib",
          fltr_refuse = F)
-#> # A tibble: 7 x 6
+#> # A tibble: 9 x 6
 #> # Groups:   group [3]
 #>   question response group          m    m_se     n
-#>   <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
-#> 1 metgoal  Achieved overall  0.818   0.0250    154
-#> 2 metgoal  Refused  overall  0.00556 0.00397     2
-#> 3 metgoal  Unachiev overall  0.167   0.0241     48
-#> 4 metgoal  Achieved Eligible 0.986   0.00793   114
-#> 5 metgoal  Unachiev Eligible 0.0138  0.00793     3
-#> 6 metgoal  Achieved Ineligib 0.546   0.0588     40
-#> 7 metgoal  Unachiev Ineligib 0.454   0.0588     45
+#>   <chr>    <fct>    <fct>      <dbl>   <dbl> <int>
+#> 1 metgoal  achieved overall  0.818   0.0250    154
+#> 2 metgoal  refused  overall  0.00556 0.00397     2
+#> 3 metgoal  unachiev overall  0.167   0.0241     48
+#> 4 metgoal  achieved eligible 0.986   0.00793   114
+#> 5 metgoal  refused  eligible 0       0           0
+#> 6 metgoal  unachiev eligible 0.0138  0.00793     3
+#> 7 metgoal  achieved ineligib 0.546   0.0588     40
+#> 8 metgoal  refused  ineligib 0       0           0
+#> 9 metgoal  unachiev ineligib 0.454   0.0588     45
 ```
 
 ### Example 4 - Filter NA responses or groups with `fltr_nas`
@@ -236,20 +238,24 @@ svytldr(df = svytldr_df,
          svygrp = "eligib",
          fltr_refuse = F,
          fltr_nas = F)
-#> # A tibble: 10 x 6
+#> # A tibble: 14 x 6
 #> # Groups:   group [4]
 #>    question response group          m    m_se     n
-#>    <chr>    <chr>    <chr>      <dbl>   <dbl> <int>
-#>  1 metgoal  Achieved overall  0.818   0.0250    154
-#>  2 metgoal  Refused  overall  0.00556 0.00397     2
-#>  3 metgoal  Unachiev overall  0.167   0.0241     48
+#>    <chr>    <fct>    <fct>      <dbl>   <dbl> <int>
+#>  1 metgoal  achieved overall  0.818   0.0250    154
+#>  2 metgoal  refused  overall  0.00556 0.00397     2
+#>  3 metgoal  unachiev overall  0.167   0.0241     48
 #>  4 metgoal  <NA>     overall  0.00930 0.00733     2
-#>  5 metgoal  Achieved Eligible 0.986   0.00793   114
-#>  6 metgoal  Unachiev Eligible 0.0138  0.00793     3
-#>  7 metgoal  Achieved Ineligib 0.546   0.0588     40
-#>  8 metgoal  Unachiev Ineligib 0.454   0.0588     45
-#>  9 metgoal  Refused  <NA>     0.374   0.250       2
-#> 10 metgoal  <NA>     <NA>     0.626   0.250       2
+#>  5 metgoal  achieved eligible 0.986   0.00793   114
+#>  6 metgoal  refused  eligible 0       0           0
+#>  7 metgoal  unachiev eligible 0.0138  0.00793     3
+#>  8 metgoal  achieved ineligib 0.546   0.0588     40
+#>  9 metgoal  refused  ineligib 0       0           0
+#> 10 metgoal  unachiev ineligib 0.454   0.0588     45
+#> 11 metgoal  achieved <NA>     0       0           0
+#> 12 metgoal  refused  <NA>     0.374   0.250       2
+#> 13 metgoal  unachiev <NA>     0       0           0
+#> 14 metgoal  <NA>     <NA>     0.626   0.250       2
 ```
 
 ### Example 5 - Flag low sample size subgroups with `flg_low_n`
@@ -270,13 +276,13 @@ svytldr(df = svytldr_df,
 #> # A tibble: 6 x 7
 #> # Groups:   group [3]
 #>   question response group         m    m_se     n low_n_flg
-#>   <chr>    <chr>    <chr>     <dbl>   <dbl> <int>     <dbl>
-#> 1 metgoal  Achieved overall  0.818  0.0250    154         0
-#> 2 metgoal  Unachiev overall  0.167  0.0241     48         1
-#> 3 metgoal  Achieved Eligible 0.986  0.00793   114         0
-#> 4 metgoal  Unachiev Eligible 0.0138 0.00793     3         1
-#> 5 metgoal  Achieved Ineligib 0.546  0.0588     40         1
-#> 6 metgoal  Unachiev Ineligib 0.454  0.0588     45         1
+#>   <chr>    <fct>    <fct>     <dbl>   <dbl> <int>     <dbl>
+#> 1 metgoal  achieved overall  0.818  0.0250    154         0
+#> 2 metgoal  unachiev overall  0.167  0.0241     48         1
+#> 3 metgoal  achieved eligible 0.986  0.00793   114         0
+#> 4 metgoal  unachiev eligible 0.0138 0.00793     3         1
+#> 5 metgoal  achieved ineligib 0.546  0.0588     40         1
+#> 6 metgoal  unachiev ineligib 0.454  0.0588     45         1
 ```
 
 ### Example 6 - Present group results as columns with `wide`
