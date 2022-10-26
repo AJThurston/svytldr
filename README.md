@@ -66,7 +66,7 @@ Finally, this is just a simple formatting argument to change the output
 from long `tidy` format data to wide format as in typical survey
 toplines or for papers:
 
-- fmttd_tbl: Produces a formatted table with columns for each group and
+- wide: Produces a formatted table with columns for each group and
   statistic (Default = F; statistics nested w/in group) \[logical\]
 
 ## Example dataframe `svytldr_df`
