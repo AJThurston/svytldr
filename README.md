@@ -38,7 +38,7 @@ The following packages and versions are required to use `svytldr`:
 
 ## Arguments
 
-The `svytldr` package requires the following arguments:
+The `svytldr` function requires the following arguments:
 
 - df: A survey dataframe consisting of at minimum a survey item
   formatted as a factor variable.\[class = data.frame\]
@@ -84,7 +84,7 @@ library(tidyverse)
 data(svytldr_df)
 ```
 
-## Examples
+## Examples - `svytldr`
 
 ### Example 1 - Basic Use
 
@@ -305,3 +305,107 @@ fmttd %>%
 ```
 
 ![](https://github.com/AJThurston/svytldr/blob/main/man/figures/ex6.PNG)
+
+## Example - `svytldr_missing`
+
+This helper cleaning function is designed to help clean factor variables
+from SPSS datasets when imported using the `foreign` package. These
+values from these datasets sometimes come in the form of “value: value
+label”. The goal of this function is to preserve the underlying factor
+variable while allowing some basic cleaning.
+
+The variable `motiv` in the `svytldr_df` is used for illustrating this
+function. It contains the following possible values:
+
+- 1: intrinsic
+- 2: extrinsic
+- 3: other
+- -100
+- -99
+- -98
+- -97
+
+The `svytldr_missing` function requires the following arguments:
+
+- df: A survey dataframe consisting of at minimum a survey item
+  formatted as a factor variable.\[class = data.frame\]
+- missing_list: A list of missing values, gsub strings can be included
+  in the list (e.g., “-9.\*“) to remove all values starting with or
+  ending with a particular value. Identified values are recoded to `NA`
+  \[list\]
+
+The following argument is optional:
+
+- clean_val_labs = Will remove SPSS style value labels (before: “value:
+  value label”) to value as factor (after: “value”), default is `FALSE`
+  \[logical\]
+
+### Before
+
+``` r
+library(summarytools)
+freq(svytldr_df$motiv)
+#> Frequencies  
+#> svytldr_df$motiv  
+#> Type: Factor  
+#> 
+#>                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+#> ------------------ ------ --------- -------------- --------- --------------
+#>       1: intrinsic     58     28.16          28.16     28.16          28.16
+#>       2: extrinsic     91     44.17          72.33     44.17          72.33
+#>           3: other     57     27.67         100.00     27.67         100.00
+#>               <NA>      0                               0.00         100.00
+#>              Total    206    100.00         100.00    100.00         100.00
+```
+
+### After
+
+``` r
+svytldr_df <- svytldr_df %>%
+  svytldr_missing(., 
+                  missing_list = c("-100","-9.*"))
+freq(svytldr_df$motiv)
+#> Frequencies  
+#> svytldr_df$motiv  
+#> Type: Factor  
+#> 
+#>                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+#> ------------------ ------ --------- -------------- --------- --------------
+#>       1: intrinsic     58     28.16          28.16     28.16          28.16
+#>       2: extrinsic     91     44.17          72.33     44.17          72.33
+#>           3: other     57     27.67         100.00     27.67         100.00
+#>               <NA>      0                               0.00         100.00
+#>              Total    206    100.00         100.00    100.00         100.00
+```
+
+Removing the SPSS value labels.
+
+``` r
+freq(svytldr_df$motiv)
+#> Frequencies  
+#> svytldr_df$motiv  
+#> Type: Factor  
+#> 
+#>                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+#> ------------------ ------ --------- -------------- --------- --------------
+#>       1: intrinsic     58     28.16          28.16     28.16          28.16
+#>       2: extrinsic     91     44.17          72.33     44.17          72.33
+#>           3: other     57     27.67         100.00     27.67         100.00
+#>               <NA>      0                               0.00         100.00
+#>              Total    206    100.00         100.00    100.00         100.00
+df <- svytldr_missing(svytldr_df, 
+                missing_list = c("-100","-9.*"),
+                clean_val_labs = T)
+freq(df$motiv)
+#> Frequencies  
+#> df$motiv  
+#> Type: Factor  
+#> 
+#>               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+#> ----------- ------ --------- -------------- --------- --------------
+#>           1     58     28.16          28.16     28.16          28.16
+#>           2     91     44.17          72.33     44.17          72.33
+#>           3     57     27.67         100.00     27.67         100.00
+#>        <NA>      0                               0.00         100.00
+#>       Total    206    100.00         100.00    100.00         100.00
+```
