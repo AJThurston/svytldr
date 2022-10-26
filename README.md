@@ -12,13 +12,6 @@ The goal of svytldr is to provide basic, formatted values from complex
 survey data. It is basically just a wrapper for the srvyr package. This
 package is predominantly for working with factor variables.
 
-## To-Do
-
-- Actually make IDS, Strata, and Weights optional, use “is.missing” from
-  this answer:
-  <https://stackoverflow.com/questions/28370249/correct-way-to-specifiy-optional-arguments-in-r-functions>  
-- Move away from pipes apparently
-
 ## Installation
 
 You can install svytldr from GitHub with:
@@ -35,6 +28,14 @@ The following packages and versions are required to use `svytldr`:
 - survey (4.1-1)
 - srvyr (1.1.0)
 - tidyverse (1.3.2)
+
+## Note
+
+In addition to the `svytldr` function, the package provides a [helper
+cleaning
+function](https://github.com/AJThurston/svytldr#examples---svytldr_missing)
+that is designed to focus on factor variables for analysis as in the
+examples below.
 
 ## Arguments
 
@@ -306,7 +307,7 @@ fmttd %>%
 
 ![](https://github.com/AJThurston/svytldr/blob/main/man/figures/ex6.PNG)
 
-## Example - `svytldr_missing`
+## Examples - `svytldr_missing`
 
 This helper cleaning function is designed to help clean factor variables
 from SPSS datasets when imported using the `foreign` package. These
@@ -330,7 +331,7 @@ The `svytldr_missing` function requires the following arguments:
 - df: A survey dataframe consisting of at minimum a survey item
   formatted as a factor variable.\[class = data.frame\]
 - missing_list: A list of missing values, gsub strings can be included
-  in the list (e.g., “-9.\*“) to remove all values starting with or
+  in the list (e.g., “-9.\*”) to remove all values starting with or
   ending with a particular value. Identified values are recoded to `NA`
   \[list\]
 
@@ -339,8 +340,6 @@ The following argument is optional:
 - clean_val_labs = Will remove SPSS style value labels (before: “value:
   value label”) to value as factor (after: “value”), default is `FALSE`
   \[logical\]
-
-### Before
 
 ``` r
 library(summarytools)
@@ -351,19 +350,20 @@ freq(svytldr_df$motiv)
 #> 
 #>                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 #> ------------------ ------ --------- -------------- --------- --------------
-#>       1: intrinsic     58     28.16          28.16     28.16          28.16
-#>       2: extrinsic     91     44.17          72.33     44.17          72.33
-#>           3: other     57     27.67         100.00     27.67         100.00
+#>       1: intrinsic     44     21.36          21.36     21.36          21.36
+#>       2: extrinsic    111     53.88          75.24     53.88          75.24
+#>           3: other     47     22.82          98.06     22.82          98.06
+#>               -100      1      0.49          98.54      0.49          98.54
+#>                -99      1      0.49          99.03      0.49          99.03
+#>                -98      1      0.49          99.51      0.49          99.51
+#>                -97      1      0.49         100.00      0.49         100.00
 #>               <NA>      0                               0.00         100.00
 #>              Total    206    100.00         100.00    100.00         100.00
-```
 
-### After
-
-``` r
 svytldr_df <- svytldr_df %>%
   svytldr_missing(., 
                   missing_list = c("-100","-9.*"))
+
 freq(svytldr_df$motiv)
 #> Frequencies  
 #> svytldr_df$motiv  
@@ -371,10 +371,10 @@ freq(svytldr_df$motiv)
 #> 
 #>                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 #> ------------------ ------ --------- -------------- --------- --------------
-#>       1: intrinsic     58     28.16          28.16     28.16          28.16
-#>       2: extrinsic     91     44.17          72.33     44.17          72.33
-#>           3: other     57     27.67         100.00     27.67         100.00
-#>               <NA>      0                               0.00         100.00
+#>       1: intrinsic     44     21.78          21.78     21.36          21.36
+#>       2: extrinsic    111     54.95          76.73     53.88          75.24
+#>           3: other     47     23.27         100.00     22.82          98.06
+#>               <NA>      4                               1.94         100.00
 #>              Total    206    100.00         100.00    100.00         100.00
 ```
 
@@ -388,24 +388,27 @@ freq(svytldr_df$motiv)
 #> 
 #>                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 #> ------------------ ------ --------- -------------- --------- --------------
-#>       1: intrinsic     58     28.16          28.16     28.16          28.16
-#>       2: extrinsic     91     44.17          72.33     44.17          72.33
-#>           3: other     57     27.67         100.00     27.67         100.00
-#>               <NA>      0                               0.00         100.00
+#>       1: intrinsic     44     21.78          21.78     21.36          21.36
+#>       2: extrinsic    111     54.95          76.73     53.88          75.24
+#>           3: other     47     23.27         100.00     22.82          98.06
+#>               <NA>      4                               1.94         100.00
 #>              Total    206    100.00         100.00    100.00         100.00
-df <- svytldr_missing(svytldr_df, 
-                missing_list = c("-100","-9.*"),
-                clean_val_labs = T)
-freq(df$motiv)
+
+svytldr_df <- svytldr_df %>%
+  svytldr_missing(., 
+                  missing_list = c("-100","-9.*"),
+                  clean_val_labs = T)
+
+freq(svytldr_df$motiv)
 #> Frequencies  
-#> df$motiv  
+#> svytldr_df$motiv  
 #> Type: Factor  
 #> 
 #>               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 #> ----------- ------ --------- -------------- --------- --------------
-#>           1     58     28.16          28.16     28.16          28.16
-#>           2     91     44.17          72.33     44.17          72.33
-#>           3     57     27.67         100.00     27.67         100.00
-#>        <NA>      0                               0.00         100.00
+#>           1     44     21.78          21.78     21.36          21.36
+#>           2    111     54.95          76.73     53.88          75.24
+#>           3     47     23.27         100.00     22.82          98.06
+#>        <NA>      4                               1.94         100.00
 #>       Total    206    100.00         100.00    100.00         100.00
 ```
