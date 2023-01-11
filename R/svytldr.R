@@ -33,12 +33,40 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
   itemlist <- list() # data frame list for each survey item
   grplist <- list()
 
+  # Subchain to identify survey design
+  if (!missing(ids) && !missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids, weights = weights, strata = strata)
+  }
+  if (!missing(ids) && missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids, strata = strata)
+    }
+  if (!missing(ids) && !missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids, weights = weights)
+  }
+  if (!missing(ids) && missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids)
+  }
+  if (missing(ids) && !missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(weights = weights, strata = strata)
+  }
+  if (missing(ids) && missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(strata = strata)
+  }
+  if (missing(ids) && !missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design(weights = weights)
+  }
+  if (missing(ids) && missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design()
+  }
+  
+  
+  
   for(i in svyitem){
 
     if (missing(svygrp)) {
 
       res <- df %>%
-        as_survey_design(ids = ids, strata = strata, weights = weights) %>%
+        dsgn %>%
         group_by(as.factor("overall"), df[, i], .drop = FALSE) %>%
         summarize(m = survey_mean(), n = unweighted(n()))
       colnames(res)[1] <- "group"
@@ -50,7 +78,7 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
     else {
 
       res <- df %>%
-        as_survey_design(ids = ids, strata = strata, weights = weights) %>%
+        dsgn %>%
         group_by(as.factor("overall"), df[, i], .drop = FALSE) %>%
         summarize(m = survey_mean(), n = unweighted(n()))
       colnames(res)[1] <- "group"
