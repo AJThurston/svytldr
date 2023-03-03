@@ -64,12 +64,24 @@ These are other optional arguments that change the output of values:
 - flg_low_n: Flag estimates with less than n = 100 in either svyitem
   response option or svygroup (or the combination thereof) \[logical\]
 
-Finally, this is just a simple formatting argument to change the output
+Also, this is just a simple formatting argument to change the output
 from long `tidy` format data to wide format as in typical survey
 toplines or for papers:
 
 - wide: Produces a formatted table with columns for each group and
-  statistic (Default = F; statistics nested w/in group) \[logical\]
+  statistic (Default = FALSE; statistics nested w/in group) \[logical\]
+
+When using wide format, there are also options for dropping unwanted
+columns created by default.
+
+- drop.overall: Used in conjunction w. wide, drops the overall columns
+  (Default = FALSE) \[logical\]
+- drop.m: Used in conjunction w. wide, drops the columns for mean
+  (Default = FALSE) \[logical\]
+- drop.m_se: Used in conjunction w. wide, drops the columns for se(mean)
+  (Default = FALSE) \[logical\]
+- drop.n: Used in conjunction w. wide, drops the columns for sample size
+  n (Default = FALSE) \[logical\]
 
 ## Example dataframe `svytldr_df`
 
@@ -307,6 +319,29 @@ fmttd %>%
 ```
 
 ![](https://github.com/AJThurston/svytldr/blob/main/man/figures/ex6.PNG)
+
+When using the wide format, you can use options `drop.overall` to drop
+the estimates for all survey respondents. You can also use `drop.m`,
+`drop.m_se`, and `drop.n` to remove the columns for these parameter
+estimates.
+
+``` r
+svytldr(df = svytldr_df,
+        ids = "id",
+        strata = "st",
+        weights = "wt",
+        svyitem = "metgoal",
+        svygrp = "eligib",
+        wide = T,
+        drop.overall = T,
+        drop.m_se = T,
+        drop.n = T)
+#> # A tibble: 2 x 4
+#>   question response eligible.m ineligib.m
+#>   <chr>    <fct>         <dbl>      <dbl>
+#> 1 metgoal  achieved     0.986       0.546
+#> 2 metgoal  unachiev     0.0138      0.454
+```
 
 ## Examples - `svytldr_missing`
 
