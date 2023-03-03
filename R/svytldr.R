@@ -18,7 +18,11 @@
 #' @param fltr_refuse Filter refusals formatted 'refused' (Default = TRUE)
 #' @param fltr_nas Filter NAs across dataframe (Default = TRUE)
 #' @param flg_low_n Flag estimates with less than n = 100 in either svyitem response option or svygroup (or the combination thereof)
-#' @param wide Produces a formatted table with columns for each group and statistic (Default = F; statistics nested w/in group)
+#' @param wide Produces a formatted table with columns for each group and statistic (Default = FALSE; statistics nested w/in group)
+#' @param drop.overall Used in conjunction w. wide, drops the overall columns (Default = FALSE)
+#' @param drop.m Used in conjunction w. wide, drops the columns for mean (Default = FALSE)
+#' @param drop.m_se Used in conjunction w. wide, drops the columns for se(mean) (Default = FALSE)
+#' @param drop.n Used in conjunction w. wide, drops the columns for sample size n (Default = FALSE)
 #'
 #' @return A tibble with M, SE, and unweighted Ns for each response for svyitem (or each response for svyitem within svygroup)
 #' @export
@@ -26,7 +30,7 @@
 #' @examples
 #' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
-                      fltr_nas = T, flg_low_n = F, wide = F)
+                      fltr_nas = T, flg_low_n = F, wide = F,drop.overall = F, drop.m = F, drop.m_se = F, drop.n = F)
 {
   options(survey.lonely.psu = "adjust")
 
@@ -134,6 +138,28 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
                   names_vary = "slowest")
     res
   }
+  
+    if (wide == T && drop.overall == T) {
+    suppressWarnings(res <- res %>% select(-starts_with("overall.")))
+    res
+  }
+  
+  
+  if (wide == T && drop.m == T) {
+    suppressWarnings(res <- res %>% select(-ends_with(".m")))
+    res
+  }
+  
+  if (wide == T && drop.m_se == T) {
+    suppressWarnings(res <- res %>% select(-ends_with(".m_se")))
+    res
+  }
+  
+  if (wide == T && drop.n == T) {
+    suppressWarnings(res <- res %>% select(-ends_with(".n")))
+    res
+  }
+  
   else {
     res
   }
