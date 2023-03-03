@@ -1,6 +1,6 @@
 Package: svytldr
 Title: Survey Tools for Limited Descriptive Research
-Version: 1.1.0.1
+Version: 1.1.0.2
 Authors@R: 
     person("AJ", "Thurston", , "AJ@Thurston.io", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1302-7566"))
