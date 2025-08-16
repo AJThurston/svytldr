@@ -15,10 +15,11 @@
 #' @param weights Survey weights (optional)
 #' @param svyitem A survey item with factor (or ordered factor) format
 #' @param svygrp A survey grouping variable, can be binary or multiple group, in factor format (optional)
+#' @param wide Produces a formatted table with columns for each group and statistic (Default = FALSE; statistics nested w/in group)
+#' @param spacing Adds a blank row after each question and a blank column between each group when wide = TRUE (Default = TRUE)
 #' @param fltr_refuse Filter refusals formatted 'refused' (Default = TRUE)
 #' @param fltr_nas Filter NAs across dataframe (Default = TRUE)
 #' @param flg_low_n Flag estimates with less than n = 100 in either svyitem response option or svygroup (or the combination thereof)
-#' @param wide Produces a formatted table with columns for each group and statistic (Default = FALSE; statistics nested w/in group)
 #' @param drop.overall Used in conjunction w. wide, drops the overall columns (Default = FALSE)
 #' @param drop.m Used in conjunction w. wide, drops the columns for mean (Default = FALSE)
 #' @param drop.m_se Used in conjunction w. wide, drops the columns for se(mean) (Default = FALSE)
@@ -30,14 +31,29 @@
 #' @examples
 #' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
-                      fltr_nas = T, flg_low_n = F, wide = F,drop.overall = F, drop.m = F, drop.m_se = F, drop.n = F)
+                      fltr_nas = T, flg_low_n = F, wide = F,drop.overall = F, drop.m = F, drop.m_se = F, drop.n = F, spacing = T)
 {
+
+  # ---- Dependency check ----
+
+  needed_pkgs <- c("tidyverse", "survey", "srvyr")
+  missing <- needed_pkgs[!sapply(needed_pkgs, requireNamespace, quietly = TRUE)]
+
+  if (length(missing) > 0) {
+    stop("The following packages are required but not installed: ",
+         paste(missing, collapse = ", "), call. = FALSE)
+  }
+
+  # ---- Adjust Primary Sampling Units
+
   options(survey.lonely.psu = "adjust")
+
+  # ---- Functions ----
 
   itemlist <- list() # data frame list for each survey item
   grplist <- list()
 
-  # Subchain to identify survey design
+  # ---- Survey design subchain ----
   if (!missing(ids) && !missing(weights) && !missing(strata)){
     dsgn <- . %>% as_survey_design(ids = ids, weights = weights, strata = strata)
   }
@@ -62,9 +78,9 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
   if (missing(ids) && missing(weights) && missing(strata)){
     dsgn <- . %>% as_survey_design()
   }
-  
-  
-  
+
+  # ---- Data analysis funcion ----
+
   for(i in svyitem){
 
     if (missing(svygrp)) {
@@ -92,7 +108,7 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
 
       for (g in svygrp){
 
-        res <- df %>% 
+        res <- df %>%
         dsgn %>%
           group_by(df[,g], df[,i], .drop = FALSE) %>%
           summarize(m = survey_mean(), n = unweighted(n()))
@@ -116,6 +132,8 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
     bind_rows() %>%
     select(question, response, everything())
 
+  res$question <- factor(res$question, levels = svyitem, ordered = TRUE)
+
   if (flg_low_n == T) {
     res$low_n_flg <- ifelse(res$n >= 100, 0, 1)
   }
@@ -138,29 +156,61 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
                   names_vary = "slowest")
     res
   }
-  
+
     if (wide == T && drop.overall == T) {
     suppressWarnings(res <- res %>% select(-starts_with("overall.")))
     res
   }
-  
-  
+
+
   if (wide == T && drop.m == T) {
     suppressWarnings(res <- res %>% select(-ends_with(".m")))
     res
   }
-  
+
   if (wide == T && drop.m_se == T) {
     suppressWarnings(res <- res %>% select(-ends_with(".m_se")))
     res
   }
-  
+
   if (wide == T && drop.n == T) {
     suppressWarnings(res <- res %>% select(-ends_with(".n")))
     res
   }
-  
+
   else {
-    res
+    if (wide == F && spacing == T) {
+      warning("Spacing is only available for wide format, set wide = TRUE for spacing.")
+    }
+    if (wide == T && spacing == T) {
+      # --- Extra row between questions ---
+      res <- res %>%
+          dplyr::group_split(question) %>%
+          purrr::map_dfr(~ dplyr::bind_rows(.x, tibble::tibble(
+            question = "", response = "", !!!setNames(rep(list(NA), ncol(.x) - 2), names(.x)[-(1:2)])
+          )))
+
+        # Remove the final blank row
+        res <- res[-nrow(res), ]
+
+      # --- Extra column between groups ---
+      if (!is.null(svygrp)) {
+        groups <- unique(gsub("\\..*$", "", names(res)[-c(1,2)]))
+        fixed  <- res[, 1:2]
+        blocks <- list()
+
+        for (i in seq_along(groups)) {
+          gcols <- grep(paste0("^", groups[i], "\\."), names(res), value = TRUE)
+          block <- res[, gcols, drop = FALSE]
+
+          if (i < length(groups)) {
+            block[paste0(strrep(" ", i))] <- NA
+          }
+          blocks[[i]] <- block
+        }
+        res <- cbind(fixed, do.call(cbind, blocks))
+      }
+    }
+    return(res)
   }
 }

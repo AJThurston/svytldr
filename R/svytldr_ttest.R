@@ -1,4 +1,31 @@
-svytldr.ttest <- function(df,svyitem,svygrp,design){
+svytldr.ttest <- function(df,svyitem,svygrp,weights,ids,strata){
+
+  # ---- Survey design subchain ----
+  if (!missing(ids) && !missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids, weights = weights, strata = strata)
+  }
+  if (!missing(ids) && missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids, strata = strata)
+  }
+  if (!missing(ids) && !missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids, weights = weights)
+  }
+  if (!missing(ids) && missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design(ids = ids)
+  }
+  if (missing(ids) && !missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(weights = weights, strata = strata)
+  }
+  if (missing(ids) && missing(weights) && !missing(strata)){
+    dsgn <- . %>% as_survey_design(strata = strata)
+  }
+  if (missing(ids) && !missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design(weights = weights)
+  }
+  if (missing(ids) && missing(weights) && missing(strata)){
+    dsgn <- . %>% as_survey_design()
+  }
+
   #Get all possible response options for svyitem
   res.opts <- df[,svyitem] %>%
     as.character() %>%
