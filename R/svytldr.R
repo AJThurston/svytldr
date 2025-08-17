@@ -6,6 +6,7 @@
 # 2020-01-07 Start
 # 2020-01-14 Combining M,SE,N results into one table
 # 2022-09-08 Added an option for reformatting as an APA table
+# 2025-08-17 Added features for significance testing and Cohen's d.
 
 #' svytldr
 #'
@@ -16,7 +17,7 @@
 #' @param svyitem A survey item with factor (or ordered factor) format
 #' @param svygrp A survey grouping variable, can be binary or multiple group, in factor format (optional)
 #' @param wide Produces a formatted table with columns for each group and statistic (Default = TRUE)
-#' @param ttests Provides pairwise t-tests between svygrp levels for each item/response (Default = TRUE)
+#' @param significance Provides pairwise t-tests between svygrp levels for each item/response (Default = TRUE)
 #' @param spacing Adds a blank row after each question and a blank column between each group when wide = TRUE (Default = TRUE)
 #' @param fltr_refuse Filter refusals formatted 'refused' (Default = TRUE)
 #' @param fltr_nas Filter NAs across dataframe (Default = TRUE)
@@ -26,13 +27,13 @@
 #' @param drop.m_se Used in conjunction w. wide, drops the columns for se(mean) (Default = FALSE)
 #' @param drop.n Used in conjunction w. wide, drops the columns for sample size n (Default = FALSE)
 #'
-#' @return A tibble with M, SE, and unweighted Ns for each response for svyitem (or each response for svyitem within svygroup)
+#' @return A tibble with M, SE, and unweighted Ns for each response for svyitem (or each response for svyitem within svygroup), significance testing, and Cohen's d values.
 #' @export
 #'
 #' @examples
 #' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
 svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
-                     fltr_nas = T, flg_low_n = F, wide = T, ttests = T, drop.overall = F, drop.m = F, drop.m_se = F, drop.n = F, spacing = T)
+                     fltr_nas = T, flg_low_n = F, wide = T, significance = T, drop.overall = F, drop.m = F, drop.m_se = F, drop.n = F, spacing = T)
 {
 
   # ---- Dependency check ----
@@ -180,14 +181,14 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
   }
 
   # ---- t-test functions ----
-  if (ttests && !missing(svygrp) && wide) {
-    des0 <- df %>% dsgn  # reuse your survey design subchain
+  if (significance && !missing(svygrp) && wide) {
+    des0 <- df %>% dsgn
 
     .clean <- function(x) {
       x <- as.character(x)
-      x <- gsub("[^A-Za-z0-9]+", "_", x)
-      x <- gsub("_+", "_", x)
-      x <- gsub("^_|_$", "", x)
+      x <- gsub("[^A-Za-z0-9]+", ".", x)
+      x <- gsub("\\.+", ".", x)
+      x <- gsub("^\\.|\\.$", "", x)
       trimws(x)
     }
 
@@ -196,31 +197,24 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
       resp_levels <- resp_levels[resp_levels != "refused"]
 
       purrr::map_dfr(svygrp, function(gvar) {
-        glv <- if (is.factor(df[[gvar]])) levels(df[[gvar]])
-        else df[[gvar]] %>% as.character() %>% stats::na.omit() %>% unique()
+        glv <- if (is.factor(df[[gvar]])) levels(df[[gvar]]) else df[[gvar]] %>% as.character() %>% stats::na.omit() %>% unique()
         glv <- glv[!is.na(glv)]
         if (length(glv) < 2) return(NULL)
         grp_pairs <- utils::combn(glv, 2, simplify = FALSE)
 
         purrr::map_dfr(resp_levels, function(resp_val) {
-          # indicator for this response level (use un-namespaced update for S3 dispatch)
           des_i <- update(des0, .ind = as.numeric(df[[item]] == resp_val))
 
           purrr::map_dfr(grp_pairs, function(pair) {
-            # subset with logical index to avoid NSE issues
             idx <- df[[gvar]] %in% pair
             if (!any(idx, na.rm = TRUE)) {
-              return(
-                tibble::tibble(
-                  question = item, response = resp_val,
-                  comp = paste0(.clean(pair[1]), "_v_", .clean(pair[2])),
-                  ss = NA_integer_, d = NA_real_
-                )
-              )
+              return(tibble::tibble(
+                question = item, response = resp_val,
+                comp <- paste0(.clean(pair[1]), ".v.", .clean(pair[2])),
+                ss = NA_integer_, d = NA_real_
+              ))
             }
-
             des_pair <- subset(des_i, idx)
-            # ensure both levels present in the subset
             present <- unique(df[[gvar]][idx])
             if (length(intersect(present, pair)) < 2) {
               tval <- NA_real_; dfv <- NA_real_; pval <- NA_real_
@@ -239,9 +233,9 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
             tibble::tibble(
               question = item,
               response = resp_val,
-              comp     = paste0(.clean(pair[1]), "_v_", .clean(pair[2])),
+              comp     = paste0(.clean(pair[1]), ".v.", .clean(pair[2])),
               ss       = ifelse(is.na(pval), NA_integer_, as.integer(pval < 0.05)),
-              d        = ifelse(is.na(tval) | is.na(dfv), NA_real_, (2 * tval) / sqrt(dfv))  # Cohen's d from t
+              d        = ifelse(is.na(tval) | is.na(dfv), NA_real_, (2 * tval) / sqrt(dfv))
             )
           })
         })
@@ -249,58 +243,88 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
     })
 
     if (!is.null(tt_out) && nrow(tt_out) > 0) {
-      # pivot to wide once; columns like "<comp>.ss" and "<comp>.d"
       tt_wide <- tt_out %>%
         tidyr::pivot_wider(
           names_from  = comp,
           values_from = c(ss, d),
-          names_glue  = "{comp}.{.value}"
+          names_glue  = "{comp}_{.value}"
         )
-
-      # append to your already-wide res (adds columns at the end)
       res <- dplyr::left_join(res, tt_wide, by = c("question", "response"))
     }
   }
 
+  # ---- Spacing subchain ----
+  if (wide == T && spacing == T) {
+    # --- Extra row between questions ---
+    res <- res %>%
+      dplyr::group_split(question) %>%
+      purrr::map_dfr(~ dplyr::bind_rows(.x, tibble::tibble(
+        question = "", response = "", !!!setNames(rep(list(NA), ncol(.x) - 2), names(.x)[-(1:2)])
+      )))
+    # Remove the final blank row
+    res <- res[-nrow(res), ]
 
-    if (wide == F && spacing == T) {
-      warning("Spacing is only available for wide format, set wide = TRUE for spacing.")
-    }
-    if (wide == T && spacing == T) {
-      # --- Extra row between questions ---
-      res <- res %>%
-        dplyr::group_split(question) %>%
-        purrr::map_dfr(~ dplyr::bind_rows(.x, tibble::tibble(
-          question = "", response = "", !!!setNames(rep(list(NA), ncol(.x) - 2), names(.x)[-(1:2)])
-        )))
-      # Remove the final blank row
-      res <- res[-nrow(res), ]
-
-      # --- Extra column between groups, preserving non "^group\\." columns at the end ---
-      if (!is.null(svygrp)) {
-        # prefixes for grouped stats (e.g., overall., eligib., raceeth.)
-        groups <- unique(gsub("\\..*$", "", names(res)[-c(1, 2)]))
-        fixed  <- res[, 1:2, drop = FALSE]
-
-        # columns belonging to any group block
-        group_cols <- unlist(lapply(groups, function(g)
-          grep(paste0("^", g, "\\."), names(res), value = TRUE)
-        ), use.names = FALSE)
-
-        # everything else (e.g., eligible_v_ineligible.ss / .d)
-        other_cols <- setdiff(names(res), c(names(fixed), group_cols))
-
-        group_blocks <- lapply(seq_along(groups), function(i) {
-          g <- groups[i]
-          cols <- grep(paste0("^", g, "\\."), names(res), value = TRUE)
-          block <- res[, cols, drop = FALSE]
-          if (i < length(groups)) block[paste0(strrep(" ", i))] <- NA
-          block
-        })
-
-        # rebuild: question/response + grouped blocks + comparison columns at END
-        res <- do.call(cbind, c(list(fixed), group_blocks, list(res[, other_cols, drop = FALSE])))
+    # --- Extra column between groups; put ALL stats first, then ONE set of _ss/_d per svygrp ---
+    if (!is.null(svygrp)) {
+      .clean <- function(x) {
+        x <- gsub("[^A-Za-z0-9]+", ".", x)
+        x <- gsub("\\.+", ".", x)
+        gsub("^\\.|\\.$", "", x)
       }
+      .esc <- function(x) gsub("([][{}()+*.^$|\\\\?])", "\\\\\\1", x)
+
+      all_names <- names(res)
+      fixed     <- res[, 1:2, drop = FALSE]
+
+      # variable blocks appear in this order: overall (if present), then each svygrp in the order supplied
+      vars <- character(0)
+      if (any(grepl("^overall\\.", all_names))) vars <- c(vars, "overall")
+      vars <- c(vars, svygrp)
+
+      var_blocks <- lapply(seq_along(vars), function(i) {
+        v <- vars[i]
+
+        # levels for this variable present in the wide table
+        if (v == "overall") {
+          levs_in_res <- "overall"
+        } else {
+          levs <- if (is.factor(df[[v]])) levels(df[[v]]) else unique(stats::na.omit(as.character(df[[v]])))
+          # keep only levels that actually exist as prefixes in res
+          levs_in_res <- Filter(function(L) any(grepl(paste0("^", .esc(L), "\\."), all_names)), levs)
+        }
+        if (length(levs_in_res) == 0) return(NULL)
+
+        # 1) ALL group estimates first (m, m_se, n for every level of v, in level order)
+        stat_cols_v <- unlist(lapply(levs_in_res, function(L) {
+          grep(paste0("^", .esc(L), "\\.(m|m_se|n)$"), all_names, value = TRUE)
+        }), use.names = FALSE)
+        block <- res[, stat_cols_v, drop = FALSE]
+
+        # 2) ONE set of comparison columns AFTER all stats (for v only)
+        if (v != "overall" && length(levs_in_res) >= 2) {
+          levs_clean <- .clean(levs_in_res)
+          pairs <- utils::combn(levs_clean, 2, simplify = FALSE)
+          cmp_bases <- vapply(pairs, function(p) paste0(p[1], ".v.", p[2]), character(1))
+          # order: ..._ss then ..._d for each pair
+          want <- as.vector(rbind(paste0(cmp_bases, "_ss"), paste0(cmp_bases, "_d")))
+          cmp_cols <- want[want %in% all_names]   # keep only those that exist
+          if (length(cmp_cols) > 0) block <- cbind(block, res[, cmp_cols, drop = FALSE])
+        }
+
+        # spacer after the whole variable block, except last
+        if (i < length(vars)) block[paste0(strrep(" ", i))] <- NA
+        block
+      })
+
+      var_blocks <- Filter(Negate(is.null), var_blocks)
+
+      # Rebuild final table: question/response + per-variable blocks
+      # (append any leftover columns, if any, to avoid accidental drops)
+      included <- c(names(fixed), unlist(lapply(var_blocks, colnames), use.names = FALSE))
+      leftover <- setdiff(all_names, included)
+      res <- do.call(cbind, c(list(fixed), var_blocks,
+                              if (length(leftover)) list(res[, leftover, drop = FALSE]) else list()))
     }
-    return(res)
   }
+  return(res)
+}
