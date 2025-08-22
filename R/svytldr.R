@@ -32,7 +32,7 @@
 #'
 #' @examples
 #' svytldr(df = df, ids = id, strata = strata, weights = wt, svyitem = "svyitem", svygrp = "group")
-svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
+svytldr <- function (df, ids, strata, weights, svyitem, svygrp = NULL, fltr_refuse = T,
                      fltr_nas = T, flg_low_n = F, wide = T, significance = T, drop.overall = F, drop.m = F, drop.m_se = F, drop.n = F, spacing = T)
 {
 
