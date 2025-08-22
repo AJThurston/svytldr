@@ -54,7 +54,7 @@ The following are optional arguments, but the `svygroup` argument is
 often used:
 
 - svygrp: A survey grouping variable, can be binary or multiple group,
-  in factor format, or list of factor variables (optional) \[factor\]
+  in factor format, or list of factor variables (optional; Default = NULL) \[factor\]
 
 These are other optional arguments that change the output of values:
 
