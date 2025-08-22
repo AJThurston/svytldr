@@ -83,51 +83,32 @@ svytldr <- function (df, ids, strata, weights, svyitem, svygrp, fltr_refuse = T,
 
   # ---- Data analysis funcion ----
 
-  for(i in svyitem){
-
+  for (i in svyitem) {
     if (missing(svygrp)) {
-
-      res <- df %>%
-        dsgn %>%
-        group_by(as.factor("overall"), df[, i], .drop = FALSE) %>%
-        summarize(m = survey_mean(), n = unweighted(n()))
-      colnames(res)[1] <- "group"
-      colnames(res)[2] <- "response"
-      res$question <- i
+      df_i <- df %>% filter(!is.na(.data[[i]]))
+      res <- df_i %>% dsgn %>% group_by(group = "overall", 
+        response = .data[[i]], .drop = FALSE) %>% summarize(m = survey_mean(), 
+        n = unweighted(n())) %>% mutate(question = i)
       grplist[["overall"]] <- res
     }
-
     else {
-
-      res <- df %>%
-        dsgn %>%
-        group_by(as.factor("overall"), df[, i], .drop = FALSE) %>%
-        summarize(m = survey_mean(), n = unweighted(n()))
-      colnames(res)[1] <- "group"
-      colnames(res)[2] <- "response"
-      res$question <- i
+      df_i <- df %>% filter(!is.na(.data[[i]]))
+      res <- df_i %>% dsgn %>% group_by(group = "overall", 
+        response = .data[[i]], .drop = FALSE) %>% summarize(m = survey_mean(), 
+        n = unweighted(n())) %>% mutate(question = i)
       grplist[["overall"]] <- res
-
-      for (g in svygrp){
-
-        res <- df %>%
-          dsgn %>%
-          group_by(df[,g], df[,i], .drop = FALSE) %>%
-          summarize(m = survey_mean(), n = unweighted(n()))
-        colnames(res)[1] <- "group"
-        colnames(res)[2] <- "response"
-        res$question <- i
+      for (g in svygrp) {
+        df_ig <- df %>% filter(!is.na(.data[[i]]), !is.na(.data[[g]]))
+        res <- df_ig %>% dsgn %>% group_by(group = .data[[g]], 
+          response = .data[[i]], .drop = FALSE) %>% 
+          summarize(m = survey_mean(), n = unweighted(n())) %>% 
+          mutate(question = i)
         grplist[[g]] <- res
-
       }
-
-      res <- grplist %>%
-        bind_rows() %>%
-        select(question, response, group, everything())
-
+      res <- grplist %>% bind_rows() %>% select(question, 
+        response, group, everything())
     }
     itemlist[[i]] <- res
-
   }
 
   res <- itemlist %>%
